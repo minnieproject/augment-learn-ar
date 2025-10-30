@@ -82,31 +82,11 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
   };
 
   const handleOrientation = (event: DeviceOrientationEvent) => {
-    const alpha = event.alpha || 0;
-    const beta = event.beta || 0;
-    const gamma = event.gamma || 0;
-    
-    setDeviceOrientation({ alpha, beta, gamma });
-    
-    // Update camera rotation based on device orientation
-    if (controlsRef.current) {
-      const controls = controlsRef.current;
-      const camera = controls.object;
-      
-      // Convert degrees to radians and apply to camera
-      const alphaRad = (alpha * Math.PI) / 180;
-      const betaRad = (beta * Math.PI) / 180;
-      const gammaRad = (gamma * Math.PI) / 180;
-      
-      // Apply rotation to camera position around the model
-      const radius = camera.position.length();
-      camera.position.x = radius * Math.sin(alphaRad) * Math.cos(betaRad);
-      camera.position.y = radius * Math.sin(betaRad);
-      camera.position.z = radius * Math.cos(alphaRad) * Math.cos(betaRad);
-      camera.lookAt(0, 0, 0);
-      
-      controls.update();
-    }
+    setDeviceOrientation({
+      alpha: event.alpha || 0,
+      beta: event.beta || 0,
+      gamma: event.gamma || 0
+    });
   };
 
   const handleReset = () => {
@@ -175,8 +155,6 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
             rotateSpeed={0.5}
             minDistance={2}
             maxDistance={10}
-            enableRotate={true}
-            enablePan={false}
           />
         </Canvas>
       </div>

@@ -1,24 +1,72 @@
 import { Suspense, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, useGLTF, Environment, PerspectiveCamera, Html } from "@react-three/drei";
 import { Button } from "@/components/ui/button";
 import { X, RotateCcw, ZoomIn, ZoomOut, Globe, Waves } from "lucide-react";
 import { useRef, useState } from "react";
 import * as THREE from "three";
 import { toast } from "sonner";
-import { ARLabel } from "./ARLabel";
 
 interface Model3DProps {
   modelPath: string;
+  showContinents: boolean;
+  showOceans: boolean;
 }
 
-const Model3D = ({ modelPath }: Model3DProps) => {
+const Label3D = ({ position, text, lineLength = 0.8 }: { position: [number, number, number]; text: string; lineLength?: number }) => {
+  return (
+    <group position={position}>
+      {/* Pointer line from Earth surface outward */}
+      <mesh position={[0, lineLength / 2, 0]}>
+        <cylinderGeometry args={[0.01, 0.01, lineLength, 8]} />
+        <meshBasicMaterial color="white" />
+      </mesh>
+      
+      {/* HTML Label at the end of the line */}
+      <Html position={[0, lineLength, 0]} center distanceFactor={8}>
+        <div className="bg-black/90 text-white px-3 py-1.5 rounded border border-white/40 whitespace-nowrap shadow-lg pointer-events-none">
+          <span className="text-sm font-medium">{text}</span>
+        </div>
+      </Html>
+    </group>
+  );
+};
+
+const Model3D = ({ modelPath, showContinents, showOceans }: Model3DProps) => {
   const { scene } = useGLTF(modelPath);
   
   // Clone the scene to avoid modifying the cached version
   const clonedScene = scene.clone();
   
-  return <primitive object={clonedScene} scale={1.5} />;
+  return (
+    <group>
+      <primitive object={clonedScene} scale={1.5} />
+      
+      {/* Continent Labels - positioned on the Earth surface */}
+      {showContinents && (
+        <>
+          <Label3D position={[-0.4, 1.2, 0.8]} text="North America" />
+          <Label3D position={[-0.6, -0.5, 1.0]} text="South America" />
+          <Label3D position={[0.6, 1.0, 0.9]} text="Europe" />
+          <Label3D position={[0.5, 0.2, 1.2]} text="Africa" />
+          <Label3D position={[1.3, 0.8, 0.3]} text="Asia" />
+          <Label3D position={[1.2, -0.6, 0.6]} text="Australia" />
+          <Label3D position={[0.2, -1.3, 0.5]} text="Antarctica" />
+        </>
+      )}
+      
+      {/* Ocean Labels */}
+      {showOceans && (
+        <>
+          <Label3D position={[0.3, 1.4, 0.3]} text="Arctic Ocean" />
+          <Label3D position={[-0.2, 0.5, 1.3]} text="Atlantic Ocean" />
+          <Label3D position={[-1.0, 0.3, 0.8]} text="Pacific Ocean" />
+          <Label3D position={[1.0, 0.2, 1.0]} text="Indian Ocean" />
+          <Label3D position={[0.3, -1.3, 0.8]} text="Southern Ocean" />
+        </>
+      )}
+    </group>
+  );
 };
 
 interface ARModelViewerProps {
@@ -151,7 +199,7 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
           <pointLight position={[-10, -10, -10]} intensity={0.8} />
           
           <Suspense fallback={null}>
-            <Model3D modelPath={modelPath} />
+            <Model3D modelPath={modelPath} showContinents={showContinents} showOceans={showOceans} />
             <Environment preset="city" />
           </Suspense>
           
@@ -251,30 +299,6 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
           </p>
         </div>
       </div>
-
-      {/* Continent Labels Overlay */}
-      {showContinents && (
-        <>
-          <ARLabel text="North America" position={{ x: '35%', y: '30%' }} linePosition="bottom" />
-          <ARLabel text="South America" position={{ x: '32%', y: '60%' }} linePosition="top" />
-          <ARLabel text="Europe" position={{ x: '52%', y: '28%' }} linePosition="bottom" />
-          <ARLabel text="Africa" position={{ x: '52%', y: '52%' }} linePosition="right" />
-          <ARLabel text="Asia" position={{ x: '70%', y: '35%' }} linePosition="left" />
-          <ARLabel text="Australia" position={{ x: '72%', y: '65%' }} linePosition="left" />
-          <ARLabel text="Antarctica" position={{ x: '50%', y: '80%' }} linePosition="top" />
-        </>
-      )}
-
-      {/* Ocean Labels Overlay */}
-      {showOceans && (
-        <>
-          <ARLabel text="Arctic Ocean" position={{ x: '50%', y: '20%' }} linePosition="bottom" />
-          <ARLabel text="Atlantic Ocean" position={{ x: '40%', y: '45%' }} linePosition="left" />
-          <ARLabel text="Pacific Ocean" position={{ x: '25%', y: '42%' }} linePosition="right" />
-          <ARLabel text="Indian Ocean" position={{ x: '65%', y: '58%' }} linePosition="left" />
-          <ARLabel text="Southern Ocean" position={{ x: '50%', y: '75%' }} linePosition="top" />
-        </>
-      )}
     </div>
   );
 };

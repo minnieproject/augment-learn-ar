@@ -45,24 +45,24 @@ const Model3D = ({ modelPath, showContinents, showOceans }: Model3DProps) => {
       {/* Continent Labels - positioned on the Earth surface */}
       {showContinents && (
         <>
-          <Label3D position={[-0.4, 1.2, 0.8]} text="North America" />
-          <Label3D position={[-0.6, -0.5, 1.0]} text="South America" />
-          <Label3D position={[0.6, 1.0, 0.9]} text="Europe" />
-          <Label3D position={[0.5, 0.2, 1.2]} text="Africa" />
-          <Label3D position={[1.3, 0.8, 0.3]} text="Asia" />
-          <Label3D position={[1.2, -0.6, 0.6]} text="Australia" />
-          <Label3D position={[0.2, -1.3, 0.5]} text="Antarctica" />
+          <Label3D position={[-0.8, 0.8, 0.9]} text="NORTH AMERICA" lineLength={0.9} />
+          <Label3D position={[-0.9, -0.6, 0.7]} text="SOUTH AMERICA" lineLength={0.9} />
+          <Label3D position={[0.4, 1.0, 0.8]} text="EUROPE" lineLength={0.8} />
+          <Label3D position={[0.3, 0, 1.2]} text="AFRICA" lineLength={1.0} />
+          <Label3D position={[1.0, 0.6, 0.5]} text="ASIA" lineLength={1.0} />
+          <Label3D position={[1.1, -0.5, 0.5]} text="AUSTRALIA" lineLength={0.9} />
+          <Label3D position={[0, -1.3, 0.4]} text="ANTARCTICA" lineLength={0.8} />
         </>
       )}
       
       {/* Ocean Labels */}
       {showOceans && (
         <>
-          <Label3D position={[0.3, 1.4, 0.3]} text="Arctic Ocean" />
-          <Label3D position={[-0.2, 0.5, 1.3]} text="Atlantic Ocean" />
-          <Label3D position={[-1.0, 0.3, 0.8]} text="Pacific Ocean" />
-          <Label3D position={[1.0, 0.2, 1.0]} text="Indian Ocean" />
-          <Label3D position={[0.3, -1.3, 0.8]} text="Southern Ocean" />
+          <Label3D position={[0, 1.3, 0.5]} text="ARCTIC OCEAN" lineLength={0.7} />
+          <Label3D position={[-0.3, 0.3, 1.3]} text="ATLANTIC OCEAN" lineLength={0.9} />
+          <Label3D position={[-1.2, 0.2, 0.4]} text="PACIFIC OCEAN" lineLength={0.9} />
+          <Label3D position={[0.9, -0.2, 0.9]} text="INDIAN OCEAN" lineLength={0.9} />
+          <Label3D position={[0.5, -1.2, 0.7]} text="SOUTHERN OCEAN" lineLength={0.8} />
         </>
       )}
     </group>

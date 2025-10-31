@@ -35,6 +35,10 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
   const [showContinents, setShowContinents] = useState(false);
   const [showOceans, setShowOceans] = useState(false);
 
+  // Debug log
+  console.log("AR Viewer loaded for:", topicTitle);
+  console.log("Show continent buttons?", topicTitle === "Planet Earth");
+
   useEffect(() => {
     startCamera();
     requestDeviceOrientation();
@@ -138,8 +142,8 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
       </div>
 
       {/* 3D Canvas Overlay */}
-      <div className="absolute inset-0 pointer-events-none">
-        <Canvas className="w-full h-full pointer-events-auto">
+      <div className="absolute inset-0 pointer-events-none" style={{ pointerEvents: 'none' }}>
+        <Canvas className="w-full h-full" style={{ pointerEvents: 'auto' }}>
           <PerspectiveCamera makeDefault position={[0, 0, 5]} fov={50} zoom={zoom} />
           <ambientLight intensity={0.7} />
           <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.5} castShadow />
@@ -210,11 +214,11 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
       </div>
 
       {/* Controls */}
-      <div className="absolute bottom-8 left-0 right-0 z-10">
-        <div className="container mx-auto flex flex-col items-center gap-4">
+      <div className="absolute bottom-8 left-0 right-0 z-[100]" style={{ pointerEvents: 'none' }}>
+        <div className="container mx-auto flex flex-col items-center gap-4" style={{ pointerEvents: 'auto' }}>
           {/* Feature Buttons - Show only for Earth topic */}
           {topicTitle === "Planet Earth" && (
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap justify-center">
               <Button
                 onClick={() => {
                   setShowContinents(!showContinents);
@@ -223,8 +227,10 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
                 }}
                 variant="outline"
                 size="lg"
-                className={`backdrop-blur-sm border-white/20 text-white hover:bg-black/70 transition-all ${
-                  showContinents ? 'bg-primary/80' : 'bg-black/50'
+                className={`backdrop-blur-md border-2 transition-all shadow-lg ${
+                  showContinents 
+                    ? 'bg-primary border-primary text-primary-foreground hover:bg-primary/90' 
+                    : 'bg-black/70 border-white/40 text-white hover:bg-black/90 hover:border-white/60'
                 }`}
               >
                 <Globe className="w-5 h-5 mr-2" />
@@ -239,8 +245,10 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
                 }}
                 variant="outline"
                 size="lg"
-                className={`backdrop-blur-sm border-white/20 text-white hover:bg-black/70 transition-all ${
-                  showOceans ? 'bg-primary/80' : 'bg-black/50'
+                className={`backdrop-blur-md border-2 transition-all shadow-lg ${
+                  showOceans 
+                    ? 'bg-primary border-primary text-primary-foreground hover:bg-primary/90' 
+                    : 'bg-black/70 border-white/40 text-white hover:bg-black/90 hover:border-white/60'
                 }`}
               >
                 <Waves className="w-5 h-5 mr-2" />
@@ -250,12 +258,12 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
           )}
           
           {/* Navigation Controls */}
-          <div className="flex justify-center gap-3">
+          <div className="flex justify-center gap-3 flex-wrap">
             <Button
               onClick={handleZoomOut}
               variant="outline"
               size="lg"
-              className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
+              className="bg-black/70 backdrop-blur-md border-2 border-white/40 text-white hover:bg-black/90 hover:border-white/60 shadow-lg"
             >
               <ZoomOut className="w-5 h-5" />
             </Button>
@@ -264,7 +272,7 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
               onClick={handleReset}
               variant="outline"
               size="lg"
-              className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
+              className="bg-black/70 backdrop-blur-md border-2 border-white/40 text-white hover:bg-black/90 hover:border-white/60 shadow-lg"
             >
               <RotateCcw className="w-5 h-5 mr-2" />
               Reset View
@@ -274,7 +282,7 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
               onClick={handleZoomIn}
               variant="outline"
               size="lg"
-              className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
+              className="bg-black/70 backdrop-blur-md border-2 border-white/40 text-white hover:bg-black/90 hover:border-white/60 shadow-lg"
             >
               <ZoomIn className="w-5 h-5" />
             </Button>

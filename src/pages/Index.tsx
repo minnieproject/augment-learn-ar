@@ -4,6 +4,7 @@ import { TopicCard } from "@/components/TopicCard";
 import { ARCamera } from "@/components/ARCamera";
 import { ARModelViewer } from "@/components/ARModelViewer";
 import { toast } from "sonner";
+import heartImage from "@/assets/human-heart.jpg";
 
 interface Topic {
   id: string;
@@ -25,7 +26,7 @@ const topics: Topic[] = [
     id: "heart",
     title: "Human Heart",
     description: "Discover the anatomy and function of the cardiovascular system",
-    image: "https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=800&q=80",
+    image: heartImage,
     modelPath: "/models/Earth2.glb" // Placeholder - would use heart model
   },
   {

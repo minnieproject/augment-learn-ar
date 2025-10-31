@@ -1,8 +1,8 @@
 import { Suspense, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, useGLTF, Environment, PerspectiveCamera, Text } from "@react-three/drei";
 import { Button } from "@/components/ui/button";
-import { X, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
+import { X, RotateCcw, ZoomIn, ZoomOut, Globe, Waves } from "lucide-react";
 import { useRef, useState } from "react";
 import * as THREE from "three";
 import { toast } from "sonner";
@@ -32,6 +32,8 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
   const [zoom, setZoom] = useState(1);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [deviceOrientation, setDeviceOrientation] = useState({ alpha: 0, beta: 0, gamma: 0 });
+  const [showContinents, setShowContinents] = useState(false);
+  const [showOceans, setShowOceans] = useState(false);
 
   useEffect(() => {
     startCamera();
@@ -146,6 +148,54 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
           <Suspense fallback={null}>
             <Model3D modelPath={modelPath} />
             <Environment preset="city" />
+            
+            {/* Continent Labels */}
+            {showContinents && (
+              <>
+                <Text position={[0, 0.5, 1.5]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
+                  North America
+                </Text>
+                <Text position={[-0.3, -0.3, 1.5]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
+                  South America
+                </Text>
+                <Text position={[0.5, 0.3, 1.4]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
+                  Europe
+                </Text>
+                <Text position={[0.6, 0, 1.3]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
+                  Africa
+                </Text>
+                <Text position={[1.2, 0.2, 0.8]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
+                  Asia
+                </Text>
+                <Text position={[1.3, -0.5, 0.5]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
+                  Australia
+                </Text>
+                <Text position={[0, -0.8, 0.5]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
+                  Antarctica
+                </Text>
+              </>
+            )}
+            
+            {/* Ocean Labels */}
+            {showOceans && (
+              <>
+                <Text position={[-0.8, 0.3, 1]} fontSize={0.15} color="#00BFFF" anchorX="center" anchorY="middle">
+                  Pacific Ocean
+                </Text>
+                <Text position={[0.3, 0.2, 1.5]} fontSize={0.15} color="#00BFFF" anchorX="center" anchorY="middle">
+                  Atlantic Ocean
+                </Text>
+                <Text position={[1, 0, 1]} fontSize={0.15} color="#00BFFF" anchorX="center" anchorY="middle">
+                  Indian Ocean
+                </Text>
+                <Text position={[0.2, 0.7, 1.2]} fontSize={0.15} color="#00BFFF" anchorX="center" anchorY="middle">
+                  Arctic Ocean
+                </Text>
+                <Text position={[0, -0.9, 1]} fontSize={0.15} color="#00BFFF" anchorX="center" anchorY="middle">
+                  Southern Ocean
+                </Text>
+              </>
+            )}
           </Suspense>
           
           <OrbitControls
@@ -161,34 +211,74 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
 
       {/* Controls */}
       <div className="absolute bottom-8 left-0 right-0 z-10">
-        <div className="container mx-auto flex justify-center gap-3">
-          <Button
-            onClick={handleZoomOut}
-            variant="outline"
-            size="lg"
-            className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
-          >
-            <ZoomOut className="w-5 h-5" />
-          </Button>
+        <div className="container mx-auto flex flex-col items-center gap-4">
+          {/* Feature Buttons - Show only for Earth topic */}
+          {topicTitle === "Planet Earth" && (
+            <div className="flex gap-3">
+              <Button
+                onClick={() => {
+                  setShowContinents(!showContinents);
+                  setShowOceans(false);
+                  toast.success(showContinents ? "Continents hidden" : "Showing continents");
+                }}
+                variant="outline"
+                size="lg"
+                className={`backdrop-blur-sm border-white/20 text-white hover:bg-black/70 transition-all ${
+                  showContinents ? 'bg-primary/80' : 'bg-black/50'
+                }`}
+              >
+                <Globe className="w-5 h-5 mr-2" />
+                Continents
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  setShowOceans(!showOceans);
+                  setShowContinents(false);
+                  toast.success(showOceans ? "Oceans hidden" : "Showing oceans");
+                }}
+                variant="outline"
+                size="lg"
+                className={`backdrop-blur-sm border-white/20 text-white hover:bg-black/70 transition-all ${
+                  showOceans ? 'bg-primary/80' : 'bg-black/50'
+                }`}
+              >
+                <Waves className="w-5 h-5 mr-2" />
+                Oceans
+              </Button>
+            </div>
+          )}
           
-          <Button
-            onClick={handleReset}
-            variant="outline"
-            size="lg"
-            className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
-          >
-            <RotateCcw className="w-5 h-5 mr-2" />
-            Reset View
-          </Button>
-          
-          <Button
-            onClick={handleZoomIn}
-            variant="outline"
-            size="lg"
-            className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
-          >
-            <ZoomIn className="w-5 h-5" />
-          </Button>
+          {/* Navigation Controls */}
+          <div className="flex justify-center gap-3">
+            <Button
+              onClick={handleZoomOut}
+              variant="outline"
+              size="lg"
+              className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
+            >
+              <ZoomOut className="w-5 h-5" />
+            </Button>
+            
+            <Button
+              onClick={handleReset}
+              variant="outline"
+              size="lg"
+              className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
+            >
+              <RotateCcw className="w-5 h-5 mr-2" />
+              Reset View
+            </Button>
+            
+            <Button
+              onClick={handleZoomIn}
+              variant="outline"
+              size="lg"
+              className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
+            >
+              <ZoomIn className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
       </div>
 

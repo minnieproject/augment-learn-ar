@@ -1,11 +1,12 @@
 import { Suspense, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment, PerspectiveCamera, Text } from "@react-three/drei";
+import { OrbitControls, useGLTF, Environment, PerspectiveCamera } from "@react-three/drei";
 import { Button } from "@/components/ui/button";
 import { X, RotateCcw, ZoomIn, ZoomOut, Globe, Waves } from "lucide-react";
 import { useRef, useState } from "react";
 import * as THREE from "three";
 import { toast } from "sonner";
+import { ARLabel } from "./ARLabel";
 
 interface Model3DProps {
   modelPath: string;
@@ -152,54 +153,6 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
           <Suspense fallback={null}>
             <Model3D modelPath={modelPath} />
             <Environment preset="city" />
-            
-            {/* Continent Labels */}
-            {showContinents && (
-              <>
-                <Text position={[0, 0.5, 1.5]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
-                  North America
-                </Text>
-                <Text position={[-0.3, -0.3, 1.5]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
-                  South America
-                </Text>
-                <Text position={[0.5, 0.3, 1.4]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
-                  Europe
-                </Text>
-                <Text position={[0.6, 0, 1.3]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
-                  Africa
-                </Text>
-                <Text position={[1.2, 0.2, 0.8]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
-                  Asia
-                </Text>
-                <Text position={[1.3, -0.5, 0.5]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
-                  Australia
-                </Text>
-                <Text position={[0, -0.8, 0.5]} fontSize={0.15} color="#FFD700" anchorX="center" anchorY="middle">
-                  Antarctica
-                </Text>
-              </>
-            )}
-            
-            {/* Ocean Labels */}
-            {showOceans && (
-              <>
-                <Text position={[-0.8, 0.3, 1]} fontSize={0.15} color="#00BFFF" anchorX="center" anchorY="middle">
-                  Pacific Ocean
-                </Text>
-                <Text position={[0.3, 0.2, 1.5]} fontSize={0.15} color="#00BFFF" anchorX="center" anchorY="middle">
-                  Atlantic Ocean
-                </Text>
-                <Text position={[1, 0, 1]} fontSize={0.15} color="#00BFFF" anchorX="center" anchorY="middle">
-                  Indian Ocean
-                </Text>
-                <Text position={[0.2, 0.7, 1.2]} fontSize={0.15} color="#00BFFF" anchorX="center" anchorY="middle">
-                  Arctic Ocean
-                </Text>
-                <Text position={[0, -0.9, 1]} fontSize={0.15} color="#00BFFF" anchorX="center" anchorY="middle">
-                  Southern Ocean
-                </Text>
-              </>
-            )}
           </Suspense>
           
           <OrbitControls
@@ -298,6 +251,30 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
           </p>
         </div>
       </div>
+
+      {/* Continent Labels Overlay */}
+      {showContinents && (
+        <>
+          <ARLabel text="North America" position={{ x: '35%', y: '30%' }} linePosition="bottom" />
+          <ARLabel text="South America" position={{ x: '32%', y: '60%' }} linePosition="top" />
+          <ARLabel text="Europe" position={{ x: '52%', y: '28%' }} linePosition="bottom" />
+          <ARLabel text="Africa" position={{ x: '52%', y: '52%' }} linePosition="right" />
+          <ARLabel text="Asia" position={{ x: '70%', y: '35%' }} linePosition="left" />
+          <ARLabel text="Australia" position={{ x: '72%', y: '65%' }} linePosition="left" />
+          <ARLabel text="Antarctica" position={{ x: '50%', y: '80%' }} linePosition="top" />
+        </>
+      )}
+
+      {/* Ocean Labels Overlay */}
+      {showOceans && (
+        <>
+          <ARLabel text="Arctic Ocean" position={{ x: '50%', y: '20%' }} linePosition="bottom" />
+          <ARLabel text="Atlantic Ocean" position={{ x: '40%', y: '45%' }} linePosition="left" />
+          <ARLabel text="Pacific Ocean" position={{ x: '25%', y: '42%' }} linePosition="right" />
+          <ARLabel text="Indian Ocean" position={{ x: '65%', y: '58%' }} linePosition="left" />
+          <ARLabel text="Southern Ocean" position={{ x: '50%', y: '75%' }} linePosition="top" />
+        </>
+      )}
     </div>
   );
 };

@@ -1,72 +1,23 @@
 import { Suspense, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment, PerspectiveCamera, Html } from "@react-three/drei";
+import { OrbitControls, useGLTF, Environment, PerspectiveCamera } from "@react-three/drei";
 import { Button } from "@/components/ui/button";
-import { X, RotateCcw, ZoomIn, ZoomOut, Globe, Waves } from "lucide-react";
+import { X, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import { useRef, useState } from "react";
 import * as THREE from "three";
 import { toast } from "sonner";
 
 interface Model3DProps {
   modelPath: string;
-  showContinents: boolean;
-  showOceans: boolean;
 }
 
-const Label3D = ({ position, text, lineLength = 0.8 }: { position: [number, number, number]; text: string; lineLength?: number }) => {
-  return (
-    <group position={position}>
-      {/* Pointer line from Earth surface outward */}
-      <mesh position={[0, lineLength / 2, 0]}>
-        <cylinderGeometry args={[0.01, 0.01, lineLength, 8]} />
-        <meshBasicMaterial color="white" />
-      </mesh>
-      
-      {/* HTML Label at the end of the line */}
-      <Html position={[0, lineLength, 0]} center distanceFactor={8}>
-        <div className="bg-black/90 text-white px-3 py-1.5 rounded border border-white/40 whitespace-nowrap shadow-lg pointer-events-none">
-          <span className="text-sm font-medium">{text}</span>
-        </div>
-      </Html>
-    </group>
-  );
-};
-
-const Model3D = ({ modelPath, showContinents, showOceans }: Model3DProps) => {
+const Model3D = ({ modelPath }: Model3DProps) => {
   const { scene } = useGLTF(modelPath);
   
   // Clone the scene to avoid modifying the cached version
   const clonedScene = scene.clone();
   
-  return (
-    <group>
-      <primitive object={clonedScene} scale={1.5} />
-      
-      {/* Continent Labels - positioned on the Earth surface */}
-      {showContinents && (
-        <>
-          <Label3D position={[-0.8, 0.8, 0.9]} text="NORTH AMERICA" lineLength={0.9} />
-          <Label3D position={[-0.9, -0.6, 0.7]} text="SOUTH AMERICA" lineLength={0.9} />
-          <Label3D position={[0.4, 1.0, 0.8]} text="EUROPE" lineLength={0.8} />
-          <Label3D position={[0.3, 0, 1.2]} text="AFRICA" lineLength={1.0} />
-          <Label3D position={[1.0, 0.6, 0.5]} text="ASIA" lineLength={1.0} />
-          <Label3D position={[1.1, -0.5, 0.5]} text="AUSTRALIA" lineLength={0.9} />
-          <Label3D position={[0, -1.3, 0.4]} text="ANTARCTICA" lineLength={0.8} />
-        </>
-      )}
-      
-      {/* Ocean Labels */}
-      {showOceans && (
-        <>
-          <Label3D position={[0, 1.3, 0.5]} text="ARCTIC OCEAN" lineLength={0.7} />
-          <Label3D position={[-0.3, 0.3, 1.3]} text="ATLANTIC OCEAN" lineLength={0.9} />
-          <Label3D position={[-1.2, 0.2, 0.4]} text="PACIFIC OCEAN" lineLength={0.9} />
-          <Label3D position={[0.9, -0.2, 0.9]} text="INDIAN OCEAN" lineLength={0.9} />
-          <Label3D position={[0.5, -1.2, 0.7]} text="SOUTHERN OCEAN" lineLength={0.8} />
-        </>
-      )}
-    </group>
-  );
+  return <primitive object={clonedScene} scale={1.5} />;
 };
 
 interface ARModelViewerProps {
@@ -81,12 +32,6 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
   const [zoom, setZoom] = useState(1);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [deviceOrientation, setDeviceOrientation] = useState({ alpha: 0, beta: 0, gamma: 0 });
-  const [showContinents, setShowContinents] = useState(false);
-  const [showOceans, setShowOceans] = useState(false);
-
-  // Debug log
-  console.log("AR Viewer loaded for:", topicTitle);
-  console.log("Show continent buttons?", topicTitle === "Planet Earth");
 
   useEffect(() => {
     startCamera();
@@ -191,15 +136,15 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
       </div>
 
       {/* 3D Canvas Overlay */}
-      <div className="absolute inset-0 pointer-events-none" style={{ pointerEvents: 'none' }}>
-        <Canvas className="w-full h-full" style={{ pointerEvents: 'auto' }}>
+      <div className="absolute inset-0 pointer-events-none">
+        <Canvas className="w-full h-full pointer-events-auto">
           <PerspectiveCamera makeDefault position={[0, 0, 5]} fov={50} zoom={zoom} />
           <ambientLight intensity={0.7} />
           <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.5} castShadow />
           <pointLight position={[-10, -10, -10]} intensity={0.8} />
           
           <Suspense fallback={null}>
-            <Model3D modelPath={modelPath} showContinents={showContinents} showOceans={showOceans} />
+            <Model3D modelPath={modelPath} />
             <Environment preset="city" />
           </Suspense>
           
@@ -215,79 +160,35 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
       </div>
 
       {/* Controls */}
-      <div className="absolute bottom-8 left-0 right-0 z-[100]" style={{ pointerEvents: 'none' }}>
-        <div className="container mx-auto flex flex-col items-center gap-4" style={{ pointerEvents: 'auto' }}>
-          {/* Feature Buttons - Show only for Earth topic */}
-          {topicTitle === "Planet Earth" && (
-            <div className="flex gap-3 flex-wrap justify-center">
-              <Button
-                onClick={() => {
-                  setShowContinents(!showContinents);
-                  setShowOceans(false);
-                  toast.success(showContinents ? "Continents hidden" : "Showing continents");
-                }}
-                variant="outline"
-                size="lg"
-                className={`backdrop-blur-md border-2 transition-all shadow-lg ${
-                  showContinents 
-                    ? 'bg-primary border-primary text-primary-foreground hover:bg-primary/90' 
-                    : 'bg-black/70 border-white/40 text-white hover:bg-black/90 hover:border-white/60'
-                }`}
-              >
-                <Globe className="w-5 h-5 mr-2" />
-                Continents
-              </Button>
-              
-              <Button
-                onClick={() => {
-                  setShowOceans(!showOceans);
-                  setShowContinents(false);
-                  toast.success(showOceans ? "Oceans hidden" : "Showing oceans");
-                }}
-                variant="outline"
-                size="lg"
-                className={`backdrop-blur-md border-2 transition-all shadow-lg ${
-                  showOceans 
-                    ? 'bg-primary border-primary text-primary-foreground hover:bg-primary/90' 
-                    : 'bg-black/70 border-white/40 text-white hover:bg-black/90 hover:border-white/60'
-                }`}
-              >
-                <Waves className="w-5 h-5 mr-2" />
-                Oceans
-              </Button>
-            </div>
-          )}
+      <div className="absolute bottom-8 left-0 right-0 z-10">
+        <div className="container mx-auto flex justify-center gap-3">
+          <Button
+            onClick={handleZoomOut}
+            variant="outline"
+            size="lg"
+            className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
+          >
+            <ZoomOut className="w-5 h-5" />
+          </Button>
           
-          {/* Navigation Controls */}
-          <div className="flex justify-center gap-3 flex-wrap">
-            <Button
-              onClick={handleZoomOut}
-              variant="outline"
-              size="lg"
-              className="bg-black/70 backdrop-blur-md border-2 border-white/40 text-white hover:bg-black/90 hover:border-white/60 shadow-lg"
-            >
-              <ZoomOut className="w-5 h-5" />
-            </Button>
-            
-            <Button
-              onClick={handleReset}
-              variant="outline"
-              size="lg"
-              className="bg-black/70 backdrop-blur-md border-2 border-white/40 text-white hover:bg-black/90 hover:border-white/60 shadow-lg"
-            >
-              <RotateCcw className="w-5 h-5 mr-2" />
-              Reset View
-            </Button>
-            
-            <Button
-              onClick={handleZoomIn}
-              variant="outline"
-              size="lg"
-              className="bg-black/70 backdrop-blur-md border-2 border-white/40 text-white hover:bg-black/90 hover:border-white/60 shadow-lg"
-            >
-              <ZoomIn className="w-5 h-5" />
-            </Button>
-          </div>
+          <Button
+            onClick={handleReset}
+            variant="outline"
+            size="lg"
+            className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
+          >
+            <RotateCcw className="w-5 h-5 mr-2" />
+            Reset View
+          </Button>
+          
+          <Button
+            onClick={handleZoomIn}
+            variant="outline"
+            size="lg"
+            className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
+          >
+            <ZoomIn className="w-5 h-5" />
+          </Button>
         </div>
       </div>
 

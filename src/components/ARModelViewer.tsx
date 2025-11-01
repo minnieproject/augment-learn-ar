@@ -85,71 +85,71 @@ const Model3D = ({ modelPath, showContinents, showOceans }: Model3DProps) => {
   // Clone the scene to avoid modifying the cached version
   const clonedScene = scene.clone();
   
-  // Earth labels with improved geological positions
+  // Earth labels with proper geological positions
   // Scale factor 1.5 is applied to the model, so positions are relative to that
   const continents = [
     { 
       name: "NORTH AMERICA", 
-      position: [-3.2, 1.8, 0.8] as [number, number, number], 
-      surfacePosition: [-1.1, 0.7, 0.3] as [number, number, number] 
+      position: [-3.0, 1.5, 1.5] as [number, number, number], 
+      surfacePosition: [-0.95, 0.55, 0.55] as [number, number, number] 
     },
     { 
       name: "SOUTH AMERICA", 
-      position: [-3.0, -1.5, 1.2] as [number, number, number], 
-      surfacePosition: [-0.9, -0.6, 0.4] as [number, number, number] 
+      position: [-3.2, -1.8, 1.0] as [number, number, number], 
+      surfacePosition: [-1.0, -0.7, 0.35] as [number, number, number] 
     },
     { 
       name: "EUROPE", 
-      position: [1.2, 2.2, 1.8] as [number, number, number], 
-      surfacePosition: [0.4, 0.9, 0.6] as [number, number, number] 
+      position: [1.5, 2.2, 2.0] as [number, number, number], 
+      surfacePosition: [0.45, 0.85, 0.7] as [number, number, number] 
     },
     { 
       name: "AFRICA", 
-      position: [1.8, -0.8, 2.5] as [number, number, number], 
-      surfacePosition: [0.5, -0.3, 0.9] as [number, number, number] 
+      position: [1.5, -0.5, 2.8] as [number, number, number], 
+      surfacePosition: [0.5, -0.2, 1.0] as [number, number, number] 
     },
     { 
       name: "ASIA", 
-      position: [3.5, 1.5, -0.5] as [number, number, number], 
-      surfacePosition: [1.2, 0.6, -0.2] as [number, number, number] 
+      position: [3.5, 1.2, 0.5] as [number, number, number], 
+      surfacePosition: [1.15, 0.5, 0.2] as [number, number, number] 
     },
     { 
       name: "AUSTRALIA", 
-      position: [3.2, -2.0, 0.8] as [number, number, number], 
-      surfacePosition: [1.1, -0.8, 0.3] as [number, number, number] 
+      position: [3.0, -1.8, -0.5] as [number, number, number], 
+      surfacePosition: [1.05, -0.7, -0.2] as [number, number, number] 
     },
     { 
       name: "ANTARCTICA", 
-      position: [0.5, -3.2, 0.5] as [number, number, number], 
-      surfacePosition: [0.2, -1.3, 0.2] as [number, number, number] 
+      position: [0.0, -3.5, 0.0] as [number, number, number], 
+      surfacePosition: [0.0, -1.4, 0.0] as [number, number, number] 
     },
   ];
 
   const oceans = [
     { 
       name: "PACIFIC OCEAN", 
-      position: [-3.8, 0.2, -1.5] as [number, number, number], 
-      surfacePosition: [-1.3, 0.1, -0.6] as [number, number, number] 
+      position: [-3.5, 0.5, -1.8] as [number, number, number], 
+      surfacePosition: [-1.2, 0.2, -0.7] as [number, number, number] 
     },
     { 
       name: "ATLANTIC OCEAN", 
-      position: [-1.5, 0.8, 3.2] as [number, number, number], 
-      surfacePosition: [-0.5, 0.3, 1.2] as [number, number, number] 
+      position: [-1.8, 0.5, 2.8] as [number, number, number], 
+      surfacePosition: [-0.65, 0.2, 1.0] as [number, number, number] 
     },
     { 
       name: "INDIAN OCEAN", 
-      position: [2.5, -1.2, 2.8] as [number, number, number], 
-      surfacePosition: [0.9, -0.5, 1.1] as [number, number, number] 
+      position: [2.8, -1.0, 1.8] as [number, number, number], 
+      surfacePosition: [1.0, -0.4, 0.65] as [number, number, number] 
     },
     { 
       name: "ARCTIC OCEAN", 
-      position: [0.2, 3.5, 0.8] as [number, number, number], 
-      surfacePosition: [0.1, 1.4, 0.3] as [number, number, number] 
+      position: [0.5, 3.5, 0.5] as [number, number, number], 
+      surfacePosition: [0.2, 1.4, 0.2] as [number, number, number] 
     },
     { 
       name: "SOUTHERN OCEAN", 
-      position: [-1.2, -3.0, -1.0] as [number, number, number], 
-      surfacePosition: [-0.4, -1.2, -0.4] as [number, number, number] 
+      position: [-1.5, -3.2, -0.8] as [number, number, number], 
+      surfacePosition: [-0.55, -1.3, -0.3] as [number, number, number] 
     },
   ];
   
@@ -192,8 +192,8 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
   const [zoom, setZoom] = useState(1);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [deviceOrientation, setDeviceOrientation] = useState({ alpha: 0, beta: 0, gamma: 0 });
-  const [showContinents, setShowContinents] = useState(true);
-  const [showOceans, setShowOceans] = useState(true);
+  const [showContinents, setShowContinents] = useState(false);
+  const [showOceans, setShowOceans] = useState(false);
 
   useEffect(() => {
     startCamera();

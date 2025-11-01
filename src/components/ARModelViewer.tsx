@@ -1,11 +1,63 @@
 import { Suspense, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, useGLTF, Environment, PerspectiveCamera, Html } from "@react-three/drei";
 import { Button } from "@/components/ui/button";
 import { X, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import { useRef, useState } from "react";
 import * as THREE from "three";
 import { toast } from "sonner";
+
+interface Label3DProps {
+  position: [number, number, number];
+  text: string;
+  linePosition: [number, number, number];
+}
+
+const Label3D = ({ position, text, linePosition }: Label3DProps) => {
+  return (
+    <group position={position}>
+      {/* Pointer line from label to Earth */}
+      <line>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={2}
+            array={new Float32Array([0, 0, 0, linePosition[0], linePosition[1], linePosition[2]])}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial color="white" linewidth={2} />
+      </line>
+      
+      {/* HTML Label */}
+      <Html
+        position={[0, 0, 0]}
+        center
+        distanceFactor={8}
+        style={{
+          pointerEvents: 'none',
+          userSelect: 'none',
+        }}
+      >
+        <div
+          style={{
+            background: 'rgba(0, 0, 0, 0.85)',
+            color: 'white',
+            padding: '6px 12px',
+            borderRadius: '4px',
+            fontSize: '14px',
+            fontWeight: '600',
+            whiteSpace: 'nowrap',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          {text}
+        </div>
+      </Html>
+    </group>
+  );
+};
 
 interface Model3DProps {
   modelPath: string;
@@ -17,7 +69,49 @@ const Model3D = ({ modelPath }: Model3DProps) => {
   // Clone the scene to avoid modifying the cached version
   const clonedScene = scene.clone();
   
-  return <primitive object={clonedScene} scale={1.5} />;
+  // Earth labels with positions
+  const continents = [
+    { name: "NORTH AMERICA", position: [-2.5, 1, 1] as [number, number, number], linePosition: [-1.2, 0.6, 0.5] as [number, number, number] },
+    { name: "SOUTH AMERICA", position: [-2.5, -1, 0.5] as [number, number, number], linePosition: [-0.8, -0.8, 0.3] as [number, number, number] },
+    { name: "EUROPE", position: [1.5, 1.5, 1.2] as [number, number, number], linePosition: [0.3, 0.9, 0.5] as [number, number, number] },
+    { name: "AFRICA", position: [1.5, -0.5, 1.5] as [number, number, number], linePosition: [0.4, -0.3, 0.8] as [number, number, number] },
+    { name: "ASIA", position: [2.5, 1.2, 0] as [number, number, number], linePosition: [1.2, 0.7, 0] as [number, number, number] },
+    { name: "AUSTRALIA", position: [2.5, -1.5, -0.5] as [number, number, number], linePosition: [1.0, -0.9, -0.3] as [number, number, number] },
+    { name: "ANTARCTICA", position: [0, -2.5, 0] as [number, number, number], linePosition: [0, -1.5, 0] as [number, number, number] },
+  ];
+
+  const oceans = [
+    { name: "PACIFIC OCEAN", position: [-3, 0, -1.5] as [number, number, number], linePosition: [-1.3, 0, -0.8] as [number, number, number] },
+    { name: "ATLANTIC OCEAN", position: [-1, 0.5, 2.5] as [number, number, number], linePosition: [-0.5, 0.2, 1.3] as [number, number, number] },
+    { name: "INDIAN OCEAN", position: [2, -1, 2] as [number, number, number], linePosition: [0.8, -0.6, 1.0] as [number, number, number] },
+    { name: "ARCTIC OCEAN", position: [0, 2.5, 0.5] as [number, number, number], linePosition: [0, 1.5, 0.2] as [number, number, number] },
+  ];
+  
+  return (
+    <group>
+      <primitive object={clonedScene} scale={1.5} />
+      
+      {/* Continent Labels */}
+      {continents.map((continent) => (
+        <Label3D
+          key={continent.name}
+          position={continent.position}
+          text={continent.name}
+          linePosition={continent.linePosition}
+        />
+      ))}
+      
+      {/* Ocean Labels */}
+      {oceans.map((ocean) => (
+        <Label3D
+          key={ocean.name}
+          position={ocean.position}
+          text={ocean.name}
+          linePosition={ocean.linePosition}
+        />
+      ))}
+    </group>
+  );
 };
 
 interface ARModelViewerProps {

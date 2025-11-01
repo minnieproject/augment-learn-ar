@@ -85,71 +85,71 @@ const Model3D = ({ modelPath, showContinents, showOceans }: Model3DProps) => {
   // Clone the scene to avoid modifying the cached version
   const clonedScene = scene.clone();
   
-  // Earth labels with proper geological positions
+  // Earth labels with proper geological positions based on world map
   // Scale factor 1.5 is applied to the model, so positions are relative to that
   const continents = [
     { 
       name: "NORTH AMERICA", 
-      position: [-3.0, 1.5, 1.5] as [number, number, number], 
-      surfacePosition: [-0.95, 0.55, 0.55] as [number, number, number] 
+      position: [-3.2, 1.8, 1.2] as [number, number, number], 
+      surfacePosition: [-1.05, 0.65, 0.45] as [number, number, number] 
     },
     { 
       name: "SOUTH AMERICA", 
-      position: [-3.2, -1.8, 1.0] as [number, number, number], 
-      surfacePosition: [-1.0, -0.7, 0.35] as [number, number, number] 
+      position: [-3.0, -2.0, 1.5] as [number, number, number], 
+      surfacePosition: [-0.95, -0.75, 0.55] as [number, number, number] 
     },
     { 
       name: "EUROPE", 
-      position: [1.5, 2.2, 2.0] as [number, number, number], 
-      surfacePosition: [0.45, 0.85, 0.7] as [number, number, number] 
+      position: [1.2, 2.5, 2.2] as [number, number, number], 
+      surfacePosition: [0.38, 0.95, 0.8] as [number, number, number] 
     },
     { 
       name: "AFRICA", 
-      position: [1.5, -0.5, 2.8] as [number, number, number], 
-      surfacePosition: [0.5, -0.2, 1.0] as [number, number, number] 
+      position: [1.2, 0.0, 2.8] as [number, number, number], 
+      surfacePosition: [0.42, 0.0, 1.05] as [number, number, number] 
     },
     { 
       name: "ASIA", 
-      position: [3.5, 1.2, 0.5] as [number, number, number], 
-      surfacePosition: [1.15, 0.5, 0.2] as [number, number, number] 
+      position: [3.8, 1.8, 0.2] as [number, number, number], 
+      surfacePosition: [1.3, 0.65, 0.08] as [number, number, number] 
     },
     { 
       name: "AUSTRALIA", 
-      position: [3.0, -1.8, -0.5] as [number, number, number], 
-      surfacePosition: [1.05, -0.7, -0.2] as [number, number, number] 
+      position: [3.2, -2.2, -0.8] as [number, number, number], 
+      surfacePosition: [1.1, -0.85, -0.3] as [number, number, number] 
     },
     { 
       name: "ANTARCTICA", 
-      position: [0.0, -3.5, 0.0] as [number, number, number], 
-      surfacePosition: [0.0, -1.4, 0.0] as [number, number, number] 
+      position: [0.5, -3.8, 0.0] as [number, number, number], 
+      surfacePosition: [0.18, -1.45, 0.0] as [number, number, number] 
     },
   ];
 
   const oceans = [
     { 
       name: "PACIFIC OCEAN", 
-      position: [-3.5, 0.5, -1.8] as [number, number, number], 
-      surfacePosition: [-1.2, 0.2, -0.7] as [number, number, number] 
+      position: [-3.8, 0.8, -2.0] as [number, number, number], 
+      surfacePosition: [-1.3, 0.3, -0.75] as [number, number, number] 
     },
     { 
       name: "ATLANTIC OCEAN", 
-      position: [-1.8, 0.5, 2.8] as [number, number, number], 
-      surfacePosition: [-0.65, 0.2, 1.0] as [number, number, number] 
+      position: [-1.5, 1.2, 2.5] as [number, number, number], 
+      surfacePosition: [-0.52, 0.45, 0.9] as [number, number, number] 
     },
     { 
       name: "INDIAN OCEAN", 
-      position: [2.8, -1.0, 1.8] as [number, number, number], 
-      surfacePosition: [1.0, -0.4, 0.65] as [number, number, number] 
+      position: [2.5, -1.5, 1.5] as [number, number, number], 
+      surfacePosition: [0.88, -0.55, 0.55] as [number, number, number] 
     },
     { 
       name: "ARCTIC OCEAN", 
-      position: [0.5, 3.5, 0.5] as [number, number, number], 
-      surfacePosition: [0.2, 1.4, 0.2] as [number, number, number] 
+      position: [0.8, 3.8, 0.5] as [number, number, number], 
+      surfacePosition: [0.28, 1.45, 0.18] as [number, number, number] 
     },
     { 
       name: "SOUTHERN OCEAN", 
-      position: [-1.5, -3.2, -0.8] as [number, number, number], 
-      surfacePosition: [-0.55, -1.3, -0.3] as [number, number, number] 
+      position: [-1.0, -3.5, -1.2] as [number, number, number], 
+      surfacePosition: [-0.35, -1.35, -0.45] as [number, number, number] 
     },
   ];
   
@@ -194,13 +194,20 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
   const [deviceOrientation, setDeviceOrientation] = useState({ alpha: 0, beta: 0, gamma: 0 });
   const [showContinents, setShowContinents] = useState(false);
   const [showOceans, setShowOceans] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
 
   useEffect(() => {
     startCamera();
     requestDeviceOrientation();
     
+    // Hide instructions after 3 seconds
+    const timer = setTimeout(() => {
+      setShowInstructions(false);
+    }, 3000);
+    
     return () => {
       stopCamera();
+      clearTimeout(timer);
     };
   }, []);
 
@@ -322,7 +329,7 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
       </div>
 
       {/* Label Toggle Controls */}
-      <div className="absolute top-32 left-0 right-0 z-10 flex justify-center gap-3">
+      <div className="absolute top-24 left-0 right-0 z-10 flex justify-center gap-3">
         <Button
           onClick={() => setShowContinents(!showContinents)}
           variant="outline"
@@ -386,13 +393,15 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
       </div>
 
       {/* AR Instructions */}
-      <div className="absolute top-24 left-0 right-0 z-10 flex justify-center pointer-events-none">
-        <div className="bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border border-primary/30">
-          <p className="text-white text-sm">
-            🌍 AR Mode Active • Move camera to explore • Drag to rotate
-          </p>
+      {showInstructions && (
+        <div className="absolute top-24 left-0 right-0 z-10 flex justify-center pointer-events-none animate-in fade-in duration-300">
+          <div className="bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border border-primary/30">
+            <p className="text-white text-sm">
+              🌍 AR Mode Active • Move camera to explore • Drag to rotate
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

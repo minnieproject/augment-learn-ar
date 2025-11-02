@@ -85,71 +85,73 @@ const Model3D = ({ modelPath, showContinents, showOceans }: Model3DProps) => {
   // Clone the scene to avoid modifying the cached version
   const clonedScene = scene.clone();
   
-  // Earth labels with proper geological positions based on world map
-  // Scale factor 1.5 is applied to the model, so positions are relative to that
+  // Earth labels with proper geological positions based on geographic coordinates
+  // Unity reference: normalized positions * scale factor
+  // labelDistance = 2.4 (normalized * 1.6 * 1.5 scale)
+  // surfacePosition = 1.5 (Earth radius with scale)
   const continents = [
     { 
       name: "NORTH AMERICA", 
-      position: [-3.2, 1.8, 1.2] as [number, number, number], 
-      surfacePosition: [-1.05, 0.65, 0.45] as [number, number, number] 
+      position: [0.84, 1.08, 1.73] as [number, number, number],      // West, Mid-North
+      surfacePosition: [0.525, 0.675, 1.08] as [number, number, number] 
     },
     { 
       name: "SOUTH AMERICA", 
-      position: [-3.0, -2.0, 1.5] as [number, number, number], 
-      surfacePosition: [-0.95, -0.75, 0.55] as [number, number, number] 
+      position: [0.67, -0.84, 1.97] as [number, number, number],     // West, South
+      surfacePosition: [0.42, -0.525, 1.23] as [number, number, number] 
     },
     { 
       name: "EUROPE", 
-      position: [1.2, 2.5, 2.2] as [number, number, number], 
-      surfacePosition: [0.38, 0.95, 0.8] as [number, number, number] 
+      position: [-0.36, 1.32, 1.87] as [number, number, number],     // Slight East, North
+      surfacePosition: [-0.225, 0.825, 1.17] as [number, number, number] 
     },
     { 
       name: "AFRICA", 
-      position: [1.2, 0.0, 2.8] as [number, number, number], 
-      surfacePosition: [0.42, 0.0, 1.05] as [number, number, number] 
+      position: [-0.19, 0.12, 2.28] as [number, number, number],     // Center-East, Equator
+      surfacePosition: [-0.12, 0.075, 1.425] as [number, number, number] 
     },
     { 
       name: "ASIA", 
-      position: [3.8, 1.8, 0.2] as [number, number, number], 
-      surfacePosition: [1.3, 0.65, 0.08] as [number, number, number] 
+      position: [-1.73, 0.91, 1.15] as [number, number, number],     // Far East, North
+      surfacePosition: [-1.08, 0.57, 0.72] as [number, number, number] 
     },
     { 
       name: "AUSTRALIA", 
-      position: [3.2, -2.2, -0.8] as [number, number, number], 
-      surfacePosition: [1.1, -0.85, -0.3] as [number, number, number] 
+      position: [-1.63, -1.01, 1.01] as [number, number, number],    // Far East, South
+      surfacePosition: [-1.02, -0.63, 0.63] as [number, number, number] 
     },
     { 
       name: "ANTARCTICA", 
-      position: [0.5, -3.8, 0.0] as [number, number, number], 
-      surfacePosition: [0.18, -1.45, 0.0] as [number, number, number] 
+      position: [0.0, -2.21, 0.36] as [number, number, number],      // Bottom of globe
+      surfacePosition: [0.0, -1.38, 0.225] as [number, number, number] 
     },
   ];
 
   const oceans = [
     { 
       name: "PACIFIC OCEAN", 
-      position: [-3.8, 0.8, -2.0] as [number, number, number], 
-      surfacePosition: [-1.3, 0.3, -0.75] as [number, number, number] 
+      position: [1.8, 0.12, -1.39] as [number, number, number],      // West side, back
+      surfacePosition: [1.125, 0.075, -0.87] as [number, number, number] 
     },
     { 
       name: "ATLANTIC OCEAN", 
-      position: [-1.5, 1.2, 2.5] as [number, number, number], 
-      surfacePosition: [-0.52, 0.45, 0.9] as [number, number, number] 
+      position: [0.53, 0.67, 2.11] as [number, number, number],      // Center-West, front
+      surfacePosition: [0.33, 0.42, 1.32] as [number, number, number] 
     },
     { 
       name: "INDIAN OCEAN", 
-      position: [2.5, -1.5, 1.5] as [number, number, number], 
-      surfacePosition: [0.88, -0.55, 0.55] as [number, number, number] 
+      position: [-1.39, -0.67, 1.68] as [number, number, number],    // East, below equator
+      surfacePosition: [-0.87, -0.42, 1.05] as [number, number, number] 
     },
     { 
       name: "ARCTIC OCEAN", 
-      position: [0.8, 3.8, 0.5] as [number, number, number], 
-      surfacePosition: [0.28, 1.45, 0.18] as [number, number, number] 
+      position: [0.0, 2.21, 0.48] as [number, number, number],       // Top of globe
+      surfacePosition: [0.0, 1.38, 0.3] as [number, number, number] 
     },
     { 
       name: "SOUTHERN OCEAN", 
-      position: [-1.0, -3.5, -1.2] as [number, number, number], 
-      surfacePosition: [-0.35, -1.35, -0.45] as [number, number, number] 
+      position: [0.36, -2.04, 0.84] as [number, number, number],     // Bottom, around Antarctica
+      surfacePosition: [0.225, -1.275, 0.525] as [number, number, number] 
     },
   ];
   

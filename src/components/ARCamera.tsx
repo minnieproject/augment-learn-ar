@@ -73,24 +73,26 @@ export const ARCamera = ({ onClose, onImageRecognized, topicTitle }: ARCameraPro
     const context = canvas.getContext("2d");
     if (context) {
       context.drawImage(video, 0, 0);
-      const imageData = canvas.toDataURL("image/jpeg");
+      const imageData = canvas.toDataURL("image/jpeg", 0.8);
       
       // Use ML recognition for brain detection
       if (topicTitle === "Human Brain") {
         try {
-          const isRecognized = await recognizeImage(imageData);
+          toast.info("Analyzing image with AI...");
+          const result = await recognizeImage(imageData);
           
-          if (isRecognized) {
+          if (result.detected) {
             setIsScanning(false);
             onImageRecognized(imageData);
-            toast.success(`Brain recognized! Loading 3D model...`);
+            toast.success(`🧠 Brain detected! (${(result.confidence * 100).toFixed(0)}% confidence)\nLoading 3D model...`);
           } else {
             setIsScanning(false);
-            toast.error("No brain detected. Please try again with a brain image.");
+            toast.error(`❌ No brain detected\nTry pointing at: brain diagram, MRI scan, or anatomical illustration`);
           }
         } catch (error) {
           setIsScanning(false);
           toast.error("Recognition failed. Please try again.");
+          console.error("Recognition error:", error);
         }
       } else {
         // For other topics, simulate recognition

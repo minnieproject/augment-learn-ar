@@ -29,11 +29,11 @@ const topics: Topic[] = [
     modelPath: "/models/Earth2.glb" // Placeholder - would use heart model
   },
   {
-    id: "cell",
-    title: "Plant Cell",
-    description: "Learn about cellular structure and organelles in detail",
-    image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=800&q=80",
-    modelPath: "/models/Earth2.glb" // Placeholder - would use cell model
+    id: "brain",
+    title: "Human Brain",
+    description: "Explore the anatomy and neural structures of the human brain in 3D",
+    image: "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=800&q=80",
+    modelPath: "/models/brain.glb"
   }
 ];
 
@@ -51,7 +51,7 @@ const Index = () => {
     setFilteredTopics(filtered);
     
     if (filtered.length === 0) {
-      toast.error("No topics found. Try 'Earth', 'Heart', or 'Cell'");
+      toast.error("No topics found. Try 'Earth', 'Heart', or 'Brain'");
     } else {
       toast.success(`Found ${filtered.length} topic(s)`);
     }

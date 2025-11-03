@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useBrainRecognition } from "@/hooks/useBrainRecognition";
 
 interface ARCameraProps {
   onClose: () => void;
@@ -14,13 +15,25 @@ export const ARCamera = ({ onClose, onImageRecognized, topicTitle }: ARCameraPro
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const { recognizeImage, isLoading: modelLoading, initializeModel } = useBrainRecognition();
 
   useEffect(() => {
     startCamera();
+    
+    // Pre-load the ML model for brain recognition
+    if (topicTitle === "Human Brain") {
+      toast.info("Loading AI recognition model...");
+      initializeModel().then(() => {
+        toast.success("AI model ready!");
+      }).catch(() => {
+        toast.error("Failed to load AI model");
+      });
+    }
+    
     return () => {
       stopCamera();
     };
-  }, []);
+  }, [topicTitle, initializeModel]);
 
   const startCamera = async () => {
     try {
@@ -62,12 +75,31 @@ export const ARCamera = ({ onClose, onImageRecognized, topicTitle }: ARCameraPro
       context.drawImage(video, 0, 0);
       const imageData = canvas.toDataURL("image/jpeg");
       
-      // Simulate image recognition (in production, use actual ML model)
-      setTimeout(() => {
-        setIsScanning(false);
-        onImageRecognized(imageData);
-        toast.success(`Recognized: ${topicTitle}! Loading 3D model...`);
-      }, 2000);
+      // Use ML recognition for brain detection
+      if (topicTitle === "Human Brain") {
+        try {
+          const isRecognized = await recognizeImage(imageData);
+          
+          if (isRecognized) {
+            setIsScanning(false);
+            onImageRecognized(imageData);
+            toast.success(`Brain recognized! Loading 3D model...`);
+          } else {
+            setIsScanning(false);
+            toast.error("No brain detected. Please try again with a brain image.");
+          }
+        } catch (error) {
+          setIsScanning(false);
+          toast.error("Recognition failed. Please try again.");
+        }
+      } else {
+        // For other topics, simulate recognition
+        setTimeout(() => {
+          setIsScanning(false);
+          onImageRecognized(imageData);
+          toast.success(`Recognized: ${topicTitle}! Loading 3D model...`);
+        }, 1500);
+      }
     }
   };
 

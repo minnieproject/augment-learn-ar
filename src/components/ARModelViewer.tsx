@@ -77,9 +77,10 @@ interface Model3DProps {
   modelPath: string;
   showContinents: boolean;
   showOceans: boolean;
+  topicTitle: string;
 }
 
-const Model3D = ({ modelPath, showContinents, showOceans }: Model3DProps) => {
+const Model3D = ({ modelPath, showContinents, showOceans, topicTitle }: Model3DProps) => {
   const { scene } = useGLTF(modelPath);
   
   // Clone the scene to avoid modifying the cached version
@@ -155,12 +156,15 @@ const Model3D = ({ modelPath, showContinents, showOceans }: Model3DProps) => {
     },
   ];
   
+  // Show labels only for Earth model
+  const isEarth = topicTitle === "Planet Earth";
+  
   return (
     <group>
       <primitive object={clonedScene} scale={1.5} />
       
-      {/* Continent Labels */}
-      {showContinents && continents.map((continent) => (
+      {/* Continent Labels - Only for Earth */}
+      {isEarth && showContinents && continents.map((continent) => (
         <Label3D
           key={continent.name}
           position={continent.position}
@@ -169,8 +173,8 @@ const Model3D = ({ modelPath, showContinents, showOceans }: Model3DProps) => {
         />
       ))}
       
-      {/* Ocean Labels */}
-      {showOceans && oceans.map((ocean) => (
+      {/* Ocean Labels - Only for Earth */}
+      {isEarth && showOceans && oceans.map((ocean) => (
         <Label3D
           key={ocean.name}
           position={ocean.position}
@@ -315,7 +319,12 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
           <pointLight position={[-10, -10, -10]} intensity={0.8} />
           
           <Suspense fallback={null}>
-            <Model3D modelPath={modelPath} showContinents={showContinents} showOceans={showOceans} />
+            <Model3D 
+              modelPath={modelPath} 
+              showContinents={showContinents} 
+              showOceans={showOceans}
+              topicTitle={topicTitle}
+            />
             <Environment preset="city" />
           </Suspense>
           
@@ -330,36 +339,38 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
         </Canvas>
       </div>
 
-      {/* Label Toggle Controls */}
-      <div className="absolute top-24 left-0 right-0 z-10 flex justify-center gap-3">
-        <Button
-          onClick={() => setShowContinents(!showContinents)}
-          variant="outline"
-          size="sm"
-          className={`backdrop-blur-sm border-white/20 transition-all ${
-            showContinents 
-              ? 'bg-white/90 text-black hover:bg-white' 
-              : 'bg-black/50 text-white hover:bg-black/70'
-          }`}
-        >
-          <Globe className="w-4 h-4 mr-2" />
-          Continents
-        </Button>
-        
-        <Button
-          onClick={() => setShowOceans(!showOceans)}
-          variant="outline"
-          size="sm"
-          className={`backdrop-blur-sm border-white/20 transition-all ${
-            showOceans 
-              ? 'bg-white/90 text-black hover:bg-white' 
-              : 'bg-black/50 text-white hover:bg-black/70'
-          }`}
-        >
-          <Waves className="w-4 h-4 mr-2" />
-          Oceans
-        </Button>
-      </div>
+      {/* Label Toggle Controls - Only show for Earth */}
+      {topicTitle === "Planet Earth" && (
+        <div className="absolute top-24 left-0 right-0 z-10 flex justify-center gap-3">
+          <Button
+            onClick={() => setShowContinents(!showContinents)}
+            variant="outline"
+            size="sm"
+            className={`backdrop-blur-sm border-white/20 transition-all ${
+              showContinents 
+                ? 'bg-white/90 text-black hover:bg-white' 
+                : 'bg-black/50 text-white hover:bg-black/70'
+            }`}
+          >
+            <Globe className="w-4 h-4 mr-2" />
+            Continents
+          </Button>
+          
+          <Button
+            onClick={() => setShowOceans(!showOceans)}
+            variant="outline"
+            size="sm"
+            className={`backdrop-blur-sm border-white/20 transition-all ${
+              showOceans 
+                ? 'bg-white/90 text-black hover:bg-white' 
+                : 'bg-black/50 text-white hover:bg-black/70'
+            }`}
+          >
+            <Waves className="w-4 h-4 mr-2" />
+            Oceans
+          </Button>
+        </div>
+      )}
 
       {/* Controls */}
       <div className="absolute bottom-8 left-0 right-0 z-10">

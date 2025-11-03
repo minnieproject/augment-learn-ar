@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useBrainRecognition } from "@/hooks/useBrainRecognition";
 
 interface ARCameraProps {
   onClose: () => void;
@@ -14,6 +15,7 @@ export const ARCamera = ({ onClose, onImageRecognized, topicTitle }: ARCameraPro
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const { isModelLoaded, recognizeImage } = useBrainRecognition();
 
   useEffect(() => {
     startCamera();
@@ -62,12 +64,35 @@ export const ARCamera = ({ onClose, onImageRecognized, topicTitle }: ARCameraPro
       context.drawImage(video, 0, 0);
       const imageData = canvas.toDataURL("image/jpeg");
       
-      // Simulate image recognition (in production, use actual ML model)
-      setTimeout(() => {
-        setIsScanning(false);
-        onImageRecognized(imageData);
-        toast.success(`Recognized: ${topicTitle}! Loading 3D model...`);
-      }, 2000);
+      // Use AI recognition for Human Brain
+      if (topicTitle === "Human Brain") {
+        if (!isModelLoaded) {
+          toast.error("AI model is still loading... Please wait a moment");
+          setIsScanning(false);
+          return;
+        }
+
+        console.log('Starting brain image recognition...');
+        const result = await recognizeImage(imageData);
+        
+        console.log('Recognition result:', result);
+        
+        if (result.detected) {
+          setIsScanning(false);
+          onImageRecognized(imageData);
+          toast.success(`Brain detected! (${(result.confidence * 100).toFixed(1)}% confidence) Loading 3D model...`);
+        } else {
+          setIsScanning(false);
+          toast.error(`No brain detected. Confidence: ${(result.confidence * 100).toFixed(1)}%. Try a clearer brain image.`);
+        }
+      } else {
+        // Simulate recognition for other topics
+        setTimeout(() => {
+          setIsScanning(false);
+          onImageRecognized(imageData);
+          toast.success(`Recognized: ${topicTitle}! Loading 3D model...`);
+        }, 2000);
+      }
     }
   };
 

@@ -32,7 +32,7 @@ const topics: Topic[] = [
     id: "heart",
     title: "Human Heart",
     description: "Discover the anatomy and function of the cardiovascular system",
-    image: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=800&q=80",
     modelPath: "/models/heart.glb"
   }
 ];

@@ -1,8 +1,8 @@
 import { Suspense, useEffect } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Environment, PerspectiveCamera, Html, Line } from "@react-three/drei";
 import { Button } from "@/components/ui/button";
-import { X, RotateCcw, ZoomIn, ZoomOut, Globe, Waves } from "lucide-react";
+import { X, RotateCcw, ZoomIn, ZoomOut, Globe, Waves, Scissors, Heart } from "lucide-react";
 import { useRef, useState } from "react";
 import * as THREE from "three";
 import { toast } from "sonner";
@@ -78,13 +78,54 @@ interface Model3DProps {
   showContinents: boolean;
   showOceans: boolean;
   topicTitle: string;
+  isDissected: boolean;
+  isPumping: boolean;
 }
 
-const Model3D = ({ modelPath, showContinents, showOceans, topicTitle }: Model3DProps) => {
+const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, isDissected, isPumping }: Model3DProps) => {
   const { scene } = useGLTF(modelPath);
+  const groupRef = useRef<THREE.Group>(null);
   
   // Clone the scene to avoid modifying the cached version
   const clonedScene = scene.clone();
+  
+  // Pumping animation for heart
+  useFrame(({ clock }) => {
+    if (isPumping && groupRef.current && topicTitle === "Human Heart") {
+      const beatSpeed = 1.2; // beats per second
+      const scale = 1 + Math.sin(clock.getElapsedTime() * beatSpeed * Math.PI * 2) * 0.1;
+      groupRef.current.scale.setScalar(1.5 * scale);
+    } else if (groupRef.current) {
+      groupRef.current.scale.setScalar(1.5);
+    }
+  });
+  
+  // Apply clipping plane for dissection
+  useEffect(() => {
+    if (topicTitle === "Human Heart") {
+      clonedScene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          if (mesh.material) {
+            const material = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+            material.forEach((mat) => {
+              if (isDissected) {
+                // Create clipping plane to show cross-section
+                const clippingPlane = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0);
+                mat.clippingPlanes = [clippingPlane];
+                mat.clipShadows = true;
+                mat.side = THREE.DoubleSide;
+              } else {
+                mat.clippingPlanes = [];
+                mat.side = THREE.FrontSide;
+              }
+              mat.needsUpdate = true;
+            });
+          }
+        }
+      });
+    }
+  }, [isDissected, clonedScene, topicTitle]);
   
   // Earth labels with proper geological positions based on geographic coordinates
   // Unity reference: normalized positions * scale factor
@@ -160,7 +201,7 @@ const Model3D = ({ modelPath, showContinents, showOceans, topicTitle }: Model3DP
   const isEarth = topicTitle === "Planet Earth";
   
   return (
-    <group>
+    <group ref={groupRef}>
       <primitive object={clonedScene} scale={1.5} />
       
       {/* Continent Labels - Only for Earth */}
@@ -201,6 +242,8 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
   const [showContinents, setShowContinents] = useState(false);
   const [showOceans, setShowOceans] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
+  const [isDissected, setIsDissected] = useState(false);
+  const [isPumping, setIsPumping] = useState(false);
 
   useEffect(() => {
     startCamera();
@@ -324,6 +367,8 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
               showContinents={showContinents} 
               showOceans={showOceans}
               topicTitle={topicTitle}
+              isDissected={isDissected}
+              isPumping={isPumping}
             />
             <Environment preset="city" />
           </Suspense>
@@ -368,6 +413,45 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
           >
             <Waves className="w-4 h-4 mr-2" />
             Oceans
+          </Button>
+        </div>
+      )}
+
+      {/* Heart Controls - Only show for Heart */}
+      {topicTitle === "Human Heart" && (
+        <div className="absolute top-24 left-0 right-0 z-10 flex justify-center gap-3">
+          <Button
+            onClick={() => {
+              setIsDissected(!isDissected);
+              toast.success(isDissected ? "Heart restored" : "Heart dissected - view internal structure");
+            }}
+            variant="outline"
+            size="sm"
+            className={`backdrop-blur-sm border-white/20 transition-all ${
+              isDissected 
+                ? 'bg-red-500/90 text-white hover:bg-red-600' 
+                : 'bg-black/50 text-white hover:bg-black/70'
+            }`}
+          >
+            <Scissors className="w-4 h-4 mr-2" />
+            Dissect
+          </Button>
+          
+          <Button
+            onClick={() => {
+              setIsPumping(!isPumping);
+              toast.success(isPumping ? "Heart stopped" : "Heart pumping started");
+            }}
+            variant="outline"
+            size="sm"
+            className={`backdrop-blur-sm border-white/20 transition-all ${
+              isPumping 
+                ? 'bg-red-500/90 text-white hover:bg-red-600 animate-pulse' 
+                : 'bg-black/50 text-white hover:bg-black/70'
+            }`}
+          >
+            <Heart className="w-4 h-4 mr-2" />
+            Pump
           </Button>
         </div>
       )}

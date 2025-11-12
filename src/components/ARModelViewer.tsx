@@ -78,12 +78,17 @@ interface Model3DProps {
   showContinents: boolean;
   showOceans: boolean;
   topicTitle: string;
-  isDissected: boolean;
+  showChambers: boolean;
   isPumping: boolean;
 }
 
-const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, isDissected, isPumping }: Model3DProps) => {
-  const { scene } = useGLTF(modelPath);
+const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambers, isPumping }: Model3DProps) => {
+  // For heart, switch between original and sectioned model based on showChambers
+  const actualModelPath = topicTitle === "Human Heart" && showChambers 
+    ? "/models/heart-sectioned.glb" 
+    : modelPath;
+  
+  const { scene } = useGLTF(actualModelPath);
   const groupRef = useRef<THREE.Group>(null);
   
   // Clone the scene to avoid modifying the cached version
@@ -100,32 +105,6 @@ const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, isDissecte
     }
   });
   
-  // Apply clipping plane for dissection
-  useEffect(() => {
-    if (topicTitle === "Human Heart") {
-      clonedScene.traverse((child) => {
-        if ((child as THREE.Mesh).isMesh) {
-          const mesh = child as THREE.Mesh;
-          if (mesh.material) {
-            const material = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-            material.forEach((mat) => {
-              if (isDissected) {
-                // Create clipping plane to show cross-section
-                const clippingPlane = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0);
-                mat.clippingPlanes = [clippingPlane];
-                mat.clipShadows = true;
-                mat.side = THREE.DoubleSide;
-              } else {
-                mat.clippingPlanes = [];
-                mat.side = THREE.FrontSide;
-              }
-              mat.needsUpdate = true;
-            });
-          }
-        }
-      });
-    }
-  }, [isDissected, clonedScene, topicTitle]);
   
   // Earth labels with proper geological positions based on geographic coordinates
   // Unity reference: normalized positions * scale factor
@@ -242,7 +221,7 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
   const [showContinents, setShowContinents] = useState(false);
   const [showOceans, setShowOceans] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
-  const [isDissected, setIsDissected] = useState(false);
+  const [showChambers, setShowChambers] = useState(false);
   const [isPumping, setIsPumping] = useState(false);
 
   useEffect(() => {
@@ -367,7 +346,7 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
               showContinents={showContinents} 
               showOceans={showOceans}
               topicTitle={topicTitle}
-              isDissected={isDissected}
+              showChambers={showChambers}
               isPumping={isPumping}
             />
             <Environment preset="city" />
@@ -422,19 +401,19 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
         <div className="absolute top-24 left-0 right-0 z-10 flex justify-center gap-3">
           <Button
             onClick={() => {
-              setIsDissected(!isDissected);
-              toast.success(isDissected ? "Heart restored" : "Heart dissected - view internal structure");
+              setShowChambers(!showChambers);
+              toast.success(showChambers ? "Showing full heart" : "Showing heart chambers");
             }}
             variant="outline"
             size="sm"
             className={`backdrop-blur-sm border-white/20 transition-all ${
-              isDissected 
+              showChambers 
                 ? 'bg-red-500/90 text-white hover:bg-red-600' 
                 : 'bg-black/50 text-white hover:bg-black/70'
             }`}
           >
             <Scissors className="w-4 h-4 mr-2" />
-            Dissect
+            Chambers
           </Button>
           
           <Button

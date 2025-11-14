@@ -2,7 +2,7 @@ import { Suspense, useEffect } from "react";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Environment, PerspectiveCamera, Html, Line } from "@react-three/drei";
 import { Button } from "@/components/ui/button";
-import { X, RotateCcw, ZoomIn, ZoomOut, Globe, Waves, Scissors, Heart } from "lucide-react";
+import { X, RotateCcw, ZoomIn, ZoomOut, Globe, Waves, Scissors } from "lucide-react";
 import { useRef, useState } from "react";
 import * as THREE from "three";
 import { toast } from "sonner";
@@ -79,31 +79,18 @@ interface Model3DProps {
   showOceans: boolean;
   topicTitle: string;
   showChambers: boolean;
-  isPumping: boolean;
 }
 
-const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambers, isPumping }: Model3DProps) => {
+const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambers }: Model3DProps) => {
   // For heart, switch between original and sectioned model based on showChambers
   const actualModelPath = topicTitle === "Human Heart" && showChambers 
     ? "/models/heart-sectioned.glb" 
     : modelPath;
   
   const { scene } = useGLTF(actualModelPath);
-  const groupRef = useRef<THREE.Group>(null);
   
   // Clone the scene to avoid modifying the cached version
   const clonedScene = scene.clone();
-  
-  // Pumping animation for heart
-  useFrame(({ clock }) => {
-    if (isPumping && groupRef.current && topicTitle === "Human Heart") {
-      const beatSpeed = 1.2; // beats per second
-      const scale = 1 + Math.sin(clock.getElapsedTime() * beatSpeed * Math.PI * 2) * 0.1;
-      groupRef.current.scale.setScalar(1.5 * scale);
-    } else if (groupRef.current) {
-      groupRef.current.scale.setScalar(1.5);
-    }
-  });
   
   
   // Earth labels with proper geological positions based on geographic coordinates
@@ -180,7 +167,7 @@ const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambe
   const isEarth = topicTitle === "Planet Earth";
   
   return (
-    <group ref={groupRef}>
+    <group>
       <primitive object={clonedScene} scale={1.5} />
       
       {/* Continent Labels - Only for Earth */}
@@ -222,7 +209,6 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
   const [showOceans, setShowOceans] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
   const [showChambers, setShowChambers] = useState(false);
-  const [isPumping, setIsPumping] = useState(false);
 
   useEffect(() => {
     startCamera();
@@ -347,7 +333,6 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
               showOceans={showOceans}
               topicTitle={topicTitle}
               showChambers={showChambers}
-              isPumping={isPumping}
             />
             <Environment preset="city" />
           </Suspense>
@@ -414,23 +399,6 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
           >
             <Scissors className="w-4 h-4 mr-2" />
             Chambers
-          </Button>
-          
-          <Button
-            onClick={() => {
-              setIsPumping(!isPumping);
-              toast.success(isPumping ? "Heart stopped" : "Heart pumping started");
-            }}
-            variant="outline"
-            size="sm"
-            className={`backdrop-blur-sm border-white/20 transition-all ${
-              isPumping 
-                ? 'bg-red-500/90 text-white hover:bg-red-600 animate-pulse' 
-                : 'bg-black/50 text-white hover:bg-black/70'
-            }`}
-          >
-            <Heart className="w-4 h-4 mr-2" />
-            Pump
           </Button>
         </div>
       )}

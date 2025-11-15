@@ -2,7 +2,7 @@ import { Suspense, useEffect } from "react";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Environment, PerspectiveCamera, Html, Line } from "@react-three/drei";
 import { Button } from "@/components/ui/button";
-import { X, RotateCcw, ZoomIn, ZoomOut, Globe, Waves, Scissors } from "lucide-react";
+import { X, RotateCcw, ZoomIn, ZoomOut, Globe, Waves, Scissors, Brain, ScanEye } from "lucide-react";
 import { useRef, useState } from "react";
 import * as THREE from "three";
 import { toast } from "sonner";
@@ -79,13 +79,22 @@ interface Model3DProps {
   showOceans: boolean;
   topicTitle: string;
   showChambers: boolean;
+  brainView: 'default' | 'crossSection' | 'brainstem';
 }
 
-const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambers }: Model3DProps) => {
+const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambers, brainView }: Model3DProps) => {
   // For heart, switch between original and sectioned model based on showChambers
-  const actualModelPath = topicTitle === "Human Heart" && showChambers 
-    ? "/models/heart-sectioned.glb" 
-    : modelPath;
+  let actualModelPath = modelPath;
+  
+  if (topicTitle === "Human Heart" && showChambers) {
+    actualModelPath = "/models/heart-sectioned.glb";
+  } else if (topicTitle === "Human Brain") {
+    if (brainView === 'crossSection') {
+      actualModelPath = "/models/brain-crosssection.glb";
+    } else if (brainView === 'brainstem') {
+      actualModelPath = "/models/brain-brainstem.glb";
+    }
+  }
   
   const { scene } = useGLTF(actualModelPath);
   
@@ -209,6 +218,7 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
   const [showOceans, setShowOceans] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
   const [showChambers, setShowChambers] = useState(false);
+  const [brainView, setBrainView] = useState<'default' | 'crossSection' | 'brainstem'>('default');
 
   useEffect(() => {
     startCamera();
@@ -333,6 +343,7 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
               showOceans={showOceans}
               topicTitle={topicTitle}
               showChambers={showChambers}
+              brainView={brainView}
             />
             <Environment preset="city" />
           </Suspense>
@@ -399,6 +410,47 @@ export const ARModelViewer = ({ modelPath, topicTitle, onClose }: ARModelViewerP
           >
             <Scissors className="w-4 h-4 mr-2" />
             Chambers
+          </Button>
+        </div>
+      )}
+
+      {/* Brain Controls - Only show for Brain */}
+      {topicTitle === "Human Brain" && (
+        <div className="absolute top-24 left-0 right-0 z-10 flex justify-center gap-3">
+          <Button
+            onClick={() => {
+              const newView = brainView === 'crossSection' ? 'default' : 'crossSection';
+              setBrainView(newView);
+              toast.success(newView === 'crossSection' ? "Showing cross section" : "Showing full brain");
+            }}
+            variant="outline"
+            size="sm"
+            className={`backdrop-blur-sm border-white/20 transition-all ${
+              brainView === 'crossSection'
+                ? 'bg-purple-500/90 text-white hover:bg-purple-600' 
+                : 'bg-black/50 text-white hover:bg-black/70'
+            }`}
+          >
+            <ScanEye className="w-4 h-4 mr-2" />
+            Cross Section
+          </Button>
+          
+          <Button
+            onClick={() => {
+              const newView = brainView === 'brainstem' ? 'default' : 'brainstem';
+              setBrainView(newView);
+              toast.success(newView === 'brainstem' ? "Showing brainstem" : "Showing full brain");
+            }}
+            variant="outline"
+            size="sm"
+            className={`backdrop-blur-sm border-white/20 transition-all ${
+              brainView === 'brainstem'
+                ? 'bg-blue-500/90 text-white hover:bg-blue-600' 
+                : 'bg-black/50 text-white hover:bg-black/70'
+            }`}
+          >
+            <Brain className="w-4 h-4 mr-2" />
+            Brainstem
           </Button>
         </div>
       )}

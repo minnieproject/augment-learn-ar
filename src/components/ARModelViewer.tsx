@@ -184,47 +184,62 @@ const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambe
     },
   ];
 
-  // Heart anatomy labels
+  // Heart anatomy labels - comprehensive labeling of all chambers and major vessels
   const heartLabels = [
     { 
       name: "Right Atrium", 
-      position: [2.0, 1.0, 0.8] as [number, number, number],
-      surfacePosition: [0.8, 0.5, 0.3] as [number, number, number] 
+      position: [2.2, 1.2, 0.8] as [number, number, number],
+      surfacePosition: [0.9, 0.5, 0.3] as [number, number, number] 
     },
     { 
       name: "Left Atrium", 
-      position: [-2.0, 1.0, 0.8] as [number, number, number],
-      surfacePosition: [-0.8, 0.5, 0.3] as [number, number, number] 
+      position: [-2.2, 1.2, 0.8] as [number, number, number],
+      surfacePosition: [-0.9, 0.5, 0.3] as [number, number, number] 
     },
     { 
       name: "Right Ventricle", 
-      position: [2.2, -1.2, 1.2] as [number, number, number],
-      surfacePosition: [0.85, -0.5, 0.5] as [number, number, number] 
+      position: [2.4, -1.4, 1.2] as [number, number, number],
+      surfacePosition: [0.95, -0.55, 0.5] as [number, number, number] 
     },
     { 
       name: "Left Ventricle", 
-      position: [-2.2, -1.3, 1.0] as [number, number, number],
-      surfacePosition: [-0.85, -0.6, 0.4] as [number, number, number] 
+      position: [-2.4, -1.5, 1.0] as [number, number, number],
+      surfacePosition: [-0.95, -0.65, 0.4] as [number, number, number] 
     },
     { 
       name: "Aorta", 
-      position: [-1.5, 2.2, 0.5] as [number, number, number],
-      surfacePosition: [-0.5, 1.0, 0.1] as [number, number, number] 
+      position: [-1.8, 2.4, 0.5] as [number, number, number],
+      surfacePosition: [-0.6, 1.1, 0.1] as [number, number, number] 
     },
     { 
       name: "Pulmonary Artery", 
-      position: [1.3, 2.1, 0.6] as [number, number, number],
-      surfacePosition: [0.45, 0.95, 0.2] as [number, number, number] 
+      position: [1.5, 2.3, 0.6] as [number, number, number],
+      surfacePosition: [0.5, 1.0, 0.2] as [number, number, number] 
+    },
+    { 
+      name: "Pulmonary Vein", 
+      position: [-2.5, 0.8, -0.5] as [number, number, number],
+      surfacePosition: [-0.95, 0.35, -0.15] as [number, number, number] 
     },
     { 
       name: "Superior Vena Cava", 
-      position: [2.5, 1.8, -0.4] as [number, number, number],
-      surfacePosition: [1.0, 0.8, -0.1] as [number, number, number] 
+      position: [2.7, 2.0, -0.4] as [number, number, number],
+      surfacePosition: [1.1, 0.9, -0.1] as [number, number, number] 
     },
     { 
       name: "Inferior Vena Cava", 
-      position: [2.3, -0.5, -0.6] as [number, number, number],
-      surfacePosition: [0.9, -0.2, -0.2] as [number, number, number] 
+      position: [2.6, -0.7, -0.6] as [number, number, number],
+      surfacePosition: [1.0, -0.25, -0.2] as [number, number, number] 
+    },
+    { 
+      name: "Tricuspid Valve", 
+      position: [2.0, 0.0, 1.3] as [number, number, number],
+      surfacePosition: [0.75, 0.0, 0.55] as [number, number, number] 
+    },
+    { 
+      name: "Mitral Valve", 
+      position: [-2.0, 0.0, 1.3] as [number, number, number],
+      surfacePosition: [-0.75, 0.0, 0.55] as [number, number, number] 
     },
   ];
 

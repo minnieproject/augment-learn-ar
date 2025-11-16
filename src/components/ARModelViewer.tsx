@@ -243,42 +243,82 @@ const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambe
     },
   ];
 
-  // Brain cross section labels
+  // Brain cross section labels - matching the reference diagram
   const brainCrossSectionLabels = [
     { 
       name: "Cerebrum", 
-      position: [0.0, 2.2, 1.3] as [number, number, number],
-      surfacePosition: [0.0, 1.0, 0.5] as [number, number, number] 
+      position: [0.0, 2.4, 1.5] as [number, number, number],
+      surfacePosition: [0.0, 1.1, 0.6] as [number, number, number] 
+    },
+    { 
+      name: "Frontal Lobe", 
+      position: [0.8, 1.8, 2.2] as [number, number, number],
+      surfacePosition: [0.3, 0.75, 0.9] as [number, number, number] 
+    },
+    { 
+      name: "Parietal Lobe", 
+      position: [0.0, 2.0, -1.2] as [number, number, number],
+      surfacePosition: [0.0, 0.85, -0.5] as [number, number, number] 
+    },
+    { 
+      name: "Occipital Lobe", 
+      position: [0.0, 1.2, -2.4] as [number, number, number],
+      surfacePosition: [0.0, 0.5, -1.0] as [number, number, number] 
+    },
+    { 
+      name: "Temporal Lobe", 
+      position: [1.8, -0.3, 1.8] as [number, number, number],
+      surfacePosition: [0.7, -0.1, 0.7] as [number, number, number] 
     },
     { 
       name: "Corpus Callosum", 
-      position: [0.0, 1.2, 2.0] as [number, number, number],
-      surfacePosition: [0.0, 0.5, 0.8] as [number, number, number] 
+      position: [0.0, 1.4, 2.2] as [number, number, number],
+      surfacePosition: [0.0, 0.6, 0.9] as [number, number, number] 
     },
     { 
       name: "Thalamus", 
-      position: [0.0, 0.5, 2.2] as [number, number, number],
-      surfacePosition: [0.0, 0.2, 0.85] as [number, number, number] 
+      position: [0.0, 0.6, 2.4] as [number, number, number],
+      surfacePosition: [0.0, 0.25, 0.95] as [number, number, number] 
     },
     { 
       name: "Hypothalamus", 
-      position: [0.0, -0.3, 2.0] as [number, number, number],
-      surfacePosition: [0.0, -0.1, 0.75] as [number, number, number] 
-    },
-    { 
-      name: "Cerebellum", 
-      position: [0.0, -1.2, -1.6] as [number, number, number],
-      surfacePosition: [0.0, -0.5, -0.6] as [number, number, number] 
-    },
-    { 
-      name: "Brainstem", 
-      position: [0.0, -1.6, 0.8] as [number, number, number],
-      surfacePosition: [0.0, -0.65, 0.3] as [number, number, number] 
+      position: [0.0, -0.2, 2.2] as [number, number, number],
+      surfacePosition: [0.0, -0.05, 0.85] as [number, number, number] 
     },
     { 
       name: "Pituitary Gland", 
-      position: [0.0, -0.8, 2.3] as [number, number, number],
-      surfacePosition: [0.0, -0.3, 0.9] as [number, number, number] 
+      position: [0.0, -0.8, 2.5] as [number, number, number],
+      surfacePosition: [0.0, -0.3, 1.0] as [number, number, number] 
+    },
+    { 
+      name: "Pons", 
+      position: [0.0, -1.0, 2.2] as [number, number, number],
+      surfacePosition: [0.0, -0.4, 0.85] as [number, number, number] 
+    },
+    { 
+      name: "Medulla", 
+      position: [0.0, -1.6, 2.0] as [number, number, number],
+      surfacePosition: [0.0, -0.65, 0.75] as [number, number, number] 
+    },
+    { 
+      name: "Cerebellum", 
+      position: [0.0, -1.4, -2.0] as [number, number, number],
+      surfacePosition: [0.0, -0.6, -0.8] as [number, number, number] 
+    },
+    { 
+      name: "Fourth Ventricle", 
+      position: [0.0, -0.8, 1.6] as [number, number, number],
+      surfacePosition: [0.0, -0.3, 0.6] as [number, number, number] 
+    },
+    { 
+      name: "Brainstem", 
+      position: [0.0, -1.8, 1.0] as [number, number, number],
+      surfacePosition: [0.0, -0.75, 0.4] as [number, number, number] 
+    },
+    { 
+      name: "Spinal Cord", 
+      position: [0.0, -2.4, 1.2] as [number, number, number],
+      surfacePosition: [0.0, -1.0, 0.5] as [number, number, number] 
     },
   ];
 

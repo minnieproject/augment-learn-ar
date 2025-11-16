@@ -34,9 +34,9 @@ const Label3D = ({ position, text, surfacePosition, labelType = 'earth' }: Label
   const labelStyle = labelType === 'anatomy' ? {
     background: 'white',
     color: 'black',
-    padding: '6px 12px',
+    padding: '4px 10px',
     borderRadius: '4px',
-    fontSize: '12px',
+    fontSize: '10px',
     fontWeight: '600',
     whiteSpace: 'nowrap' as const,
     border: '2px solid black',
@@ -63,7 +63,7 @@ const Label3D = ({ position, text, surfacePosition, labelType = 'earth' }: Label
           [surfacePosition[0] - position[0], surfacePosition[1] - position[1], surfacePosition[2] - position[2]]
         ]}
         color={labelType === 'anatomy' ? 'black' : 'white'}
-        lineWidth={2}
+        lineWidth={3}
         dashed={false}
       />
       
@@ -188,42 +188,42 @@ const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambe
   const heartLabels = [
     { 
       name: "Right Atrium", 
-      position: [1.2, 0.8, 0.5] as [number, number, number],
+      position: [2.0, 1.0, 0.8] as [number, number, number],
       surfacePosition: [0.8, 0.5, 0.3] as [number, number, number] 
     },
     { 
       name: "Left Atrium", 
-      position: [-1.2, 0.8, 0.5] as [number, number, number],
+      position: [-2.0, 1.0, 0.8] as [number, number, number],
       surfacePosition: [-0.8, 0.5, 0.3] as [number, number, number] 
     },
     { 
       name: "Right Ventricle", 
-      position: [1.3, -0.8, 0.8] as [number, number, number],
+      position: [2.2, -1.2, 1.2] as [number, number, number],
       surfacePosition: [0.85, -0.5, 0.5] as [number, number, number] 
     },
     { 
       name: "Left Ventricle", 
-      position: [-1.3, -0.9, 0.6] as [number, number, number],
+      position: [-2.2, -1.3, 1.0] as [number, number, number],
       surfacePosition: [-0.85, -0.6, 0.4] as [number, number, number] 
     },
     { 
       name: "Aorta", 
-      position: [-0.8, 1.5, 0.2] as [number, number, number],
+      position: [-1.5, 2.2, 0.5] as [number, number, number],
       surfacePosition: [-0.5, 1.0, 0.1] as [number, number, number] 
     },
     { 
       name: "Pulmonary Artery", 
-      position: [0.7, 1.4, 0.3] as [number, number, number],
+      position: [1.3, 2.1, 0.6] as [number, number, number],
       surfacePosition: [0.45, 0.95, 0.2] as [number, number, number] 
     },
     { 
       name: "Superior Vena Cava", 
-      position: [1.5, 1.2, -0.2] as [number, number, number],
+      position: [2.5, 1.8, -0.4] as [number, number, number],
       surfacePosition: [1.0, 0.8, -0.1] as [number, number, number] 
     },
     { 
       name: "Inferior Vena Cava", 
-      position: [1.4, -0.3, -0.3] as [number, number, number],
+      position: [2.3, -0.5, -0.6] as [number, number, number],
       surfacePosition: [0.9, -0.2, -0.2] as [number, number, number] 
     },
   ];
@@ -232,37 +232,37 @@ const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambe
   const brainCrossSectionLabels = [
     { 
       name: "Cerebrum", 
-      position: [0.0, 1.5, 0.8] as [number, number, number],
+      position: [0.0, 2.2, 1.3] as [number, number, number],
       surfacePosition: [0.0, 1.0, 0.5] as [number, number, number] 
     },
     { 
       name: "Corpus Callosum", 
-      position: [0.0, 0.8, 1.2] as [number, number, number],
+      position: [0.0, 1.2, 2.0] as [number, number, number],
       surfacePosition: [0.0, 0.5, 0.8] as [number, number, number] 
     },
     { 
       name: "Thalamus", 
-      position: [0.0, 0.3, 1.3] as [number, number, number],
+      position: [0.0, 0.5, 2.2] as [number, number, number],
       surfacePosition: [0.0, 0.2, 0.85] as [number, number, number] 
     },
     { 
       name: "Hypothalamus", 
-      position: [0.0, -0.2, 1.2] as [number, number, number],
+      position: [0.0, -0.3, 2.0] as [number, number, number],
       surfacePosition: [0.0, -0.1, 0.75] as [number, number, number] 
     },
     { 
       name: "Cerebellum", 
-      position: [0.0, -0.8, -1.0] as [number, number, number],
+      position: [0.0, -1.2, -1.6] as [number, number, number],
       surfacePosition: [0.0, -0.5, -0.6] as [number, number, number] 
     },
     { 
       name: "Brainstem", 
-      position: [0.0, -1.0, 0.5] as [number, number, number],
+      position: [0.0, -1.6, 0.8] as [number, number, number],
       surfacePosition: [0.0, -0.65, 0.3] as [number, number, number] 
     },
     { 
       name: "Pituitary Gland", 
-      position: [0.0, -0.5, 1.4] as [number, number, number],
+      position: [0.0, -0.8, 2.3] as [number, number, number],
       surfacePosition: [0.0, -0.3, 0.9] as [number, number, number] 
     },
   ];
@@ -271,27 +271,27 @@ const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambe
   const brainstemLabels = [
     { 
       name: "Midbrain", 
-      position: [0.0, 1.0, 1.0] as [number, number, number],
+      position: [0.0, 1.6, 1.6] as [number, number, number],
       surfacePosition: [0.0, 0.65, 0.6] as [number, number, number] 
     },
     { 
       name: "Pons", 
-      position: [0.0, 0.2, 1.2] as [number, number, number],
+      position: [0.0, 0.3, 2.0] as [number, number, number],
       surfacePosition: [0.0, 0.1, 0.75] as [number, number, number] 
     },
     { 
       name: "Medulla Oblongata", 
-      position: [0.0, -0.6, 1.1] as [number, number, number],
+      position: [0.0, -1.0, 1.8] as [number, number, number],
       surfacePosition: [0.0, -0.4, 0.7] as [number, number, number] 
     },
     { 
       name: "Spinal Cord", 
-      position: [0.0, -1.3, 0.8] as [number, number, number],
+      position: [0.0, -2.2, 1.3] as [number, number, number],
       surfacePosition: [0.0, -0.9, 0.5] as [number, number, number] 
     },
     { 
       name: "Cerebellum", 
-      position: [0.0, 0.5, -1.2] as [number, number, number],
+      position: [0.0, 0.8, -2.0] as [number, number, number],
       surfacePosition: [0.0, 0.3, -0.75] as [number, number, number] 
     },
   ];

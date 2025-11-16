@@ -11,9 +11,10 @@ interface Label3DProps {
   position: [number, number, number];
   text: string;
   surfacePosition: [number, number, number];
+  labelType?: 'earth' | 'anatomy';
 }
 
-const Label3D = ({ position, text, surfacePosition }: Label3DProps) => {
+const Label3D = ({ position, text, surfacePosition, labelType = 'earth' }: Label3DProps) => {
   const { camera } = useThree();
   
   // Calculate if label is visible from camera perspective
@@ -24,21 +25,45 @@ const Label3D = ({ position, text, surfacePosition }: Label3DProps) => {
   const cameraToLabel = labelWorldPos.clone().normalize();
   const dotProduct = cameraToLabel.dot(cameraDirection);
   
-  // Hide labels on the back side of Earth (dot product < 0 means facing away)
+  // Hide labels on the back side (dot product < 0 means facing away)
   const isVisible = dotProduct > -0.3;
   
   if (!isVisible) return null;
   
+  // Different styles for anatomy labels
+  const labelStyle = labelType === 'anatomy' ? {
+    background: 'white',
+    color: 'black',
+    padding: '6px 12px',
+    borderRadius: '4px',
+    fontSize: '12px',
+    fontWeight: '600',
+    whiteSpace: 'nowrap' as const,
+    border: '2px solid black',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+  } : {
+    background: 'rgba(0, 0, 0, 0.9)',
+    color: 'white',
+    padding: '8px 14px',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: '700',
+    whiteSpace: 'nowrap' as const,
+    border: '2px solid rgba(255, 255, 255, 0.5)',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.8)',
+    letterSpacing: '0.5px',
+  };
+  
   return (
     <group position={position}>
-      {/* Thick pointer line from label to Earth surface */}
+      {/* Pointer line with arrow */}
       <Line
         points={[
           [0, 0, 0],
           [surfacePosition[0] - position[0], surfacePosition[1] - position[1], surfacePosition[2] - position[2]]
         ]}
-        color="white"
-        lineWidth={3}
+        color={labelType === 'anatomy' ? 'black' : 'white'}
+        lineWidth={2}
         dashed={false}
       />
       
@@ -52,20 +77,7 @@ const Label3D = ({ position, text, surfacePosition }: Label3DProps) => {
           userSelect: 'none',
         }}
       >
-        <div
-          style={{
-            background: 'rgba(0, 0, 0, 0.9)',
-            color: 'white',
-            padding: '8px 14px',
-            borderRadius: '6px',
-            fontSize: '13px',
-            fontWeight: '700',
-            whiteSpace: 'nowrap',
-            border: '2px solid rgba(255, 255, 255, 0.5)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.8)',
-            letterSpacing: '0.5px',
-          }}
-        >
+        <div style={labelStyle}>
           {text}
         </div>
       </Html>
@@ -171,9 +183,123 @@ const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambe
       surfacePosition: [0.225, -1.275, 0.525] as [number, number, number] 
     },
   ];
+
+  // Heart anatomy labels
+  const heartLabels = [
+    { 
+      name: "Right Atrium", 
+      position: [1.2, 0.8, 0.5] as [number, number, number],
+      surfacePosition: [0.8, 0.5, 0.3] as [number, number, number] 
+    },
+    { 
+      name: "Left Atrium", 
+      position: [-1.2, 0.8, 0.5] as [number, number, number],
+      surfacePosition: [-0.8, 0.5, 0.3] as [number, number, number] 
+    },
+    { 
+      name: "Right Ventricle", 
+      position: [1.3, -0.8, 0.8] as [number, number, number],
+      surfacePosition: [0.85, -0.5, 0.5] as [number, number, number] 
+    },
+    { 
+      name: "Left Ventricle", 
+      position: [-1.3, -0.9, 0.6] as [number, number, number],
+      surfacePosition: [-0.85, -0.6, 0.4] as [number, number, number] 
+    },
+    { 
+      name: "Aorta", 
+      position: [-0.8, 1.5, 0.2] as [number, number, number],
+      surfacePosition: [-0.5, 1.0, 0.1] as [number, number, number] 
+    },
+    { 
+      name: "Pulmonary Artery", 
+      position: [0.7, 1.4, 0.3] as [number, number, number],
+      surfacePosition: [0.45, 0.95, 0.2] as [number, number, number] 
+    },
+    { 
+      name: "Superior Vena Cava", 
+      position: [1.5, 1.2, -0.2] as [number, number, number],
+      surfacePosition: [1.0, 0.8, -0.1] as [number, number, number] 
+    },
+    { 
+      name: "Inferior Vena Cava", 
+      position: [1.4, -0.3, -0.3] as [number, number, number],
+      surfacePosition: [0.9, -0.2, -0.2] as [number, number, number] 
+    },
+  ];
+
+  // Brain cross section labels
+  const brainCrossSectionLabels = [
+    { 
+      name: "Cerebrum", 
+      position: [0.0, 1.5, 0.8] as [number, number, number],
+      surfacePosition: [0.0, 1.0, 0.5] as [number, number, number] 
+    },
+    { 
+      name: "Corpus Callosum", 
+      position: [0.0, 0.8, 1.2] as [number, number, number],
+      surfacePosition: [0.0, 0.5, 0.8] as [number, number, number] 
+    },
+    { 
+      name: "Thalamus", 
+      position: [0.0, 0.3, 1.3] as [number, number, number],
+      surfacePosition: [0.0, 0.2, 0.85] as [number, number, number] 
+    },
+    { 
+      name: "Hypothalamus", 
+      position: [0.0, -0.2, 1.2] as [number, number, number],
+      surfacePosition: [0.0, -0.1, 0.75] as [number, number, number] 
+    },
+    { 
+      name: "Cerebellum", 
+      position: [0.0, -0.8, -1.0] as [number, number, number],
+      surfacePosition: [0.0, -0.5, -0.6] as [number, number, number] 
+    },
+    { 
+      name: "Brainstem", 
+      position: [0.0, -1.0, 0.5] as [number, number, number],
+      surfacePosition: [0.0, -0.65, 0.3] as [number, number, number] 
+    },
+    { 
+      name: "Pituitary Gland", 
+      position: [0.0, -0.5, 1.4] as [number, number, number],
+      surfacePosition: [0.0, -0.3, 0.9] as [number, number, number] 
+    },
+  ];
+
+  // Brainstem view labels
+  const brainstemLabels = [
+    { 
+      name: "Midbrain", 
+      position: [0.0, 1.0, 1.0] as [number, number, number],
+      surfacePosition: [0.0, 0.65, 0.6] as [number, number, number] 
+    },
+    { 
+      name: "Pons", 
+      position: [0.0, 0.2, 1.2] as [number, number, number],
+      surfacePosition: [0.0, 0.1, 0.75] as [number, number, number] 
+    },
+    { 
+      name: "Medulla Oblongata", 
+      position: [0.0, -0.6, 1.1] as [number, number, number],
+      surfacePosition: [0.0, -0.4, 0.7] as [number, number, number] 
+    },
+    { 
+      name: "Spinal Cord", 
+      position: [0.0, -1.3, 0.8] as [number, number, number],
+      surfacePosition: [0.0, -0.9, 0.5] as [number, number, number] 
+    },
+    { 
+      name: "Cerebellum", 
+      position: [0.0, 0.5, -1.2] as [number, number, number],
+      surfacePosition: [0.0, 0.3, -0.75] as [number, number, number] 
+    },
+  ];
   
-  // Show labels only for Earth model
+  // Show labels based on model type
   const isEarth = topicTitle === "Planet Earth";
+  const isHeart = topicTitle === "Human Heart";
+  const isBrain = topicTitle === "Human Brain";
   
   return (
     <group>
@@ -196,6 +322,39 @@ const Model3D = ({ modelPath, showContinents, showOceans, topicTitle, showChambe
           position={ocean.position}
           text={ocean.name}
           surfacePosition={ocean.surfacePosition}
+        />
+      ))}
+
+      {/* Heart Labels - Only for Heart */}
+      {isHeart && showChambers && heartLabels.map((label) => (
+        <Label3D
+          key={label.name}
+          position={label.position}
+          text={label.name}
+          surfacePosition={label.surfacePosition}
+          labelType="anatomy"
+        />
+      ))}
+
+      {/* Brain Cross Section Labels */}
+      {isBrain && brainView === 'crossSection' && brainCrossSectionLabels.map((label) => (
+        <Label3D
+          key={label.name}
+          position={label.position}
+          text={label.name}
+          surfacePosition={label.surfacePosition}
+          labelType="anatomy"
+        />
+      ))}
+
+      {/* Brainstem Labels */}
+      {isBrain && brainView === 'brainstem' && brainstemLabels.map((label) => (
+        <Label3D
+          key={label.name}
+          position={label.position}
+          text={label.name}
+          surfacePosition={label.surfacePosition}
+          labelType="anatomy"
         />
       ))}
     </group>

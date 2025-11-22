@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { pipeline } from "@huggingface/transformers";
 
 interface ARCameraProps {
   onClose: () => void;
@@ -14,13 +15,32 @@ export const ARCamera = ({ onClose, onImageRecognized, topicTitle }: ARCameraPro
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [classifier, setClassifier] = useState<any>(null);
+  const [isLoadingModel, setIsLoadingModel] = useState(true);
 
   useEffect(() => {
     startCamera();
+    loadModel();
     return () => {
       stopCamera();
     };
   }, []);
+
+  const loadModel = async () => {
+    try {
+      const imageClassifier = await pipeline(
+        "image-classification",
+        "onnx-community/mobilenetv4_conv_small.e2400_r224_in1k",
+        { device: "webgpu" }
+      );
+      setClassifier(imageClassifier);
+      setIsLoadingModel(false);
+    } catch (error) {
+      console.error("Model loading error:", error);
+      toast.error("Could not load recognition model");
+      setIsLoadingModel(false);
+    }
+  };
 
   const startCamera = async () => {
     try {
@@ -48,7 +68,7 @@ export const ARCamera = ({ onClose, onImageRecognized, topicTitle }: ARCameraPro
   };
 
   const captureAndRecognize = async () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (!videoRef.current || !canvasRef.current || !classifier) return;
     
     setIsScanning(true);
     
@@ -62,12 +82,58 @@ export const ARCamera = ({ onClose, onImageRecognized, topicTitle }: ARCameraPro
       context.drawImage(video, 0, 0);
       const imageData = canvas.toDataURL("image/jpeg");
       
-      // Simulate image recognition (ready for ML integration with TensorFlow.js)
-      setTimeout(() => {
+      try {
+        // Perform image classification
+        const results = await classifier(imageData);
+        
+        // Check if the detected object matches the expected topic
+        const isMatch = checkImageMatch(results, topicTitle);
+        
+        if (isMatch) {
+          setIsScanning(false);
+          onImageRecognized(imageData);
+          toast.success(`Recognized: ${topicTitle}! Loading 3D model...`);
+        } else {
+          setIsScanning(false);
+          toast.error(`Not recognized. Please scan an image of ${topicTitle}`);
+        }
+      } catch (error) {
+        console.error("Recognition error:", error);
         setIsScanning(false);
-        onImageRecognized(imageData);
-        toast.success(`Recognized: ${topicTitle}! Loading 3D model...`);
-      }, 2000);
+        toast.error("Recognition failed. Please try again.");
+      }
+    }
+  };
+
+  const checkImageMatch = (results: any[], topicTitle: string): boolean => {
+    // Get top predictions
+    const topLabels = results.slice(0, 5).map(r => r.label.toLowerCase());
+    
+    switch (topicTitle) {
+      case "Earth":
+        return topLabels.some(label => 
+          label.includes("globe") || 
+          label.includes("earth") || 
+          label.includes("planet") ||
+          label.includes("world") ||
+          label.includes("sphere")
+        );
+      case "Human Heart":
+        return topLabels.some(label => 
+          label.includes("heart") || 
+          label.includes("organ") ||
+          label.includes("cardiac") ||
+          label.includes("valentine")
+        );
+      case "Human Brain":
+        return topLabels.some(label => 
+          label.includes("brain") || 
+          label.includes("cerebral") ||
+          label.includes("cortex") ||
+          label.includes("coral") // Sometimes brain-like structures
+        );
+      default:
+        return false;
     }
   };
 
@@ -125,11 +191,16 @@ export const ARCamera = ({ onClose, onImageRecognized, topicTitle }: ARCameraPro
         
         <Button
           onClick={captureAndRecognize}
-          disabled={isScanning}
+          disabled={isScanning || isLoadingModel}
           size="lg"
           className="bg-gradient-to-r from-primary to-secondary hover:shadow-glow"
         >
-          {isScanning ? (
+          {isLoadingModel ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin mr-2" />
+              Loading AI...
+            </>
+          ) : isScanning ? (
             <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
             <>

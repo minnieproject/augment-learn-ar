@@ -1,0 +1,4 @@
+project_id = "ruakawfqzyxsvzsxcrve"
+
+[functions.recognize-image]
+verify_jwt = false

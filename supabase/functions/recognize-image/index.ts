@@ -23,14 +23,15 @@ serve(async (req) => {
     // Create a specific prompt based on the topic
     let prompt = "";
     switch (topicTitle) {
+      case "Planet Earth":
       case "Earth":
-        prompt = "Is this image showing Earth, a globe, or a representation of planet Earth? Answer with only 'yes' or 'no'.";
+        prompt = "Look at this image carefully. Is the PRIMARY subject of this image Earth, a globe, or planet Earth (in any form - photograph from space, diagram, illustration, 3D model)? You must answer ONLY with the single word 'yes' or 'no'. If Earth is visible but is just part of a larger scene (like a phone screen showing Earth), answer 'yes' if Earth is the main focus. Answer 'yes' ONLY if you can clearly see Earth/globe as the main subject.";
         break;
       case "Human Heart":
-        prompt = "Is this image showing a human heart (anatomical, diagram, or artistic representation)? Answer with only 'yes' or 'no'.";
+        prompt = "Look at this image carefully. Is the PRIMARY subject of this image a human heart (anatomical model, medical diagram, illustration, or artistic representation)? You must answer ONLY with the single word 'yes' or 'no'. Do not provide any explanation.";
         break;
       case "Human Brain":
-        prompt = "Is this image showing a human brain (anatomical, diagram, scan, or artistic representation)? Answer with only 'yes' or 'no'.";
+        prompt = "Look at this image carefully. Is the PRIMARY subject of this image a human brain (anatomical model, medical scan, diagram, or artistic representation)? You must answer ONLY with the single word 'yes' or 'no'. Do not provide any explanation.";
         break;
       default:
         prompt = "What is the main subject of this image? Answer in one sentence.";
@@ -86,12 +87,12 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const aiResponse = data.choices?.[0]?.message?.content?.toLowerCase() || "";
+    const aiResponse = data.choices?.[0]?.message?.content?.toLowerCase().trim() || "";
     
     console.log(`AI response for ${topicTitle}:`, aiResponse);
 
-    // Check if the AI confirmed it's a match
-    const isMatch = aiResponse.includes("yes");
+    // Check if the AI confirmed it's a match - look for 'yes' as a standalone word or at the start
+    const isMatch = aiResponse === "yes" || aiResponse.startsWith("yes") || /\byes\b/.test(aiResponse);
 
     return new Response(
       JSON.stringify({ isMatch, aiResponse }),
